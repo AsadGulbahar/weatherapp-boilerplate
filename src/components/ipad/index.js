@@ -8,7 +8,7 @@ import $ from 'jquery';
 // import the Button component
 import Button from '../button';
 
-import React from "react";
+import React from 'react';
 
 export default class Ipad extends Component {
 	//var Ipad = React.createClass({
@@ -16,57 +16,59 @@ export default class Ipad extends Component {
 	// a constructor with initial set states
 	constructor(props){
 		super(props);
-		this.state.useCurrentLocation = true;
-		// latitude state
-		this.state.latitute = "";
-		//	longitude state
-		this.state.longitude = "";
-		// current city state
-		this.state.currentCity = "";
-		// current country state
-		this.state.currentCountry = "";
-		// temperature state
-		this.state.temp = "";
-		// weather conditions state
-		this.state.cond = "";
-		// weather icon state
-		this.state.icon = null;
-
+		this.state = {
+			// use current location state
+			useCurrentLocation: true,
+			// latitude state
+			latitute: "",
+			//	longitude state
+			longitude: "",
+			// current city state
+			currentCity: "",
+			// current country state
+			currentCountry: "",
+			// temperature state
+			temp: "",
+			// weather conditions state
+			cond: "",
+			// weather icon state
+			icon: null
+		};
 	}
 
 	setLocation(position) {
-		if (this.useCurrentLocation){
+		if (this.state.useCurrentLocation){
 			this.setState({
 				latitude: position.coords.latitude,
 				longitude: position.coords.longitude
 			})
-		}
-	}
-
-	// function to get the current location of the user
-	getLocation() {
-		if (this.state.useCurrentLocation){
-			if (navigator.geolocation) {
-				navigator.geolocation.getCurrentPosition(setLocation);
-			}
 		} else {
 			this.setState({
-				//this is for EGLC, gonna change that so it's different depending on what user selects
 				latitude: 51.5048,
 				longitude: 0.0495
 			})
 		}
 	}
 
+	// function to get the current location of the user
+	getLocation() {
+		if (navigator.geolocation) {
+			navigator.geolocation.getCurrentPosition(
+			(position) => this.setLocation(position),
+			(e) => {
+				console.log("getLocation error: ", e);
+			});
+		} else {
+			console.log("navigator not supported");
+		}
+	}
 
 
-	//url url : "http://api.openweathermap.org/data/2.5/weather?q=London&units=metric&APPID=b406cf8ad004accec63c04f51a061e82",
 	//function to fetch location, temperature and weather conditions from openweathermap API
 	componentDidMount() {
 		this.getLocation();
-		console.log(this.state.latitude, this.state.longitude)
-		// var url = "http://api.openweathermap.org/data/2.5/weather?q=London&units=metric&APPID=b406cf8ad004accec63c04f51a061e82"
-		var url = "https://api.openweathermap.org/data/2.5/weather?lat="+this.state.latitude+"&lon"+this.state.longitude+"&appid=b406cf8ad004accec63c04f51a061e82"
+		console.log(this.state.latitute, this.state.longitude)
+		var url = "https://api.openweathermap.org/data/2.5/weather?lat="+this.state.latitute+"&lon="+this.state.longitude+"&appid=b406cf8ad004accec63c04f51a061e82"
 		fetch(url)	
 			.then((resp) => resp.json())
 			.then(data => {
@@ -84,7 +86,7 @@ export default class Ipad extends Component {
 	
 
 
-	// the main render method for the iphone component
+	// the main render method for the ipad component
 	render() { 
 		// check if temperature data is fetched, if so add the sign styling to the page
 		const tempStyles = this.state.temp ? `${style.temperature} ${style.filled}` : style.temperature;
@@ -92,9 +94,10 @@ export default class Ipad extends Component {
 		if (element){
 			element.addEventListener("change", function(){
 				var selectedValue = this.value;
+				console.log(selectedValue)
 				if (selectedValue == "current"){
-					this.state.useCurrentLocation = true;
-				} else { this.state.useCurrentLocation = false;}
+					this.setState({useCurrentLocation: true});
+				} else { this.setState({useCurrentLocation: false});}
 				console.log(selectedValue);
 			});
 		}
@@ -126,7 +129,6 @@ export default class Ipad extends Component {
 			</div>
 		);
 	}
-
 }
 
 // "coord":{"lon":-0.1257,"lat":51.5085},
