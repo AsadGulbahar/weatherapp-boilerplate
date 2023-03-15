@@ -5,17 +5,27 @@
   color: black;
   width: 1024px;
   height: 768px;
-  text-align: center;
-  padding-top: 120px;
   margin: 0 auto;
 }
 .header {
-	display: flex;
+	height: 90px;
+	color: black;
+	font-size: 1.5em;
+	font-weight: 300;
+	margin: 0;
 	flex-direction: column;
+	background-color: lightgray;
 	flex: 1;
 }
+.warning {
+	color: green;
+	font-size: 1.5em;
+	font-weight: 300;
+	margin: 0;
+	background-color: lightgray;
+}
 .section {
-	
+	height: 236px;
 }
 .details {
 	flex: 2;
@@ -23,23 +33,17 @@
 .city {
 	flex-direction: row;
 	flex: 1;
-	font-size: 5em;
+	font-size: 46px;
 	font-weight: 350;	
 }
-.country {
-	font-size: 5em;
-	font-weight: 350;	
-}
-.conditions {
-	flex: 1;
-	font-size: 1.7em;
+.conditions, img {
+	width: 120px;
 }
 .temperature {
 	flex: 2;
 	margin-top: 0;
-	font-size: 5.2em;
+	font-size: 52px;
 	font-weight: 300;
-	letter-spacing: -12px;
 }
 .filled:after {
 	content: "°";

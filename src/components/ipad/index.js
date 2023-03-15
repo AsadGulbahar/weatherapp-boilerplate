@@ -8,78 +8,136 @@ import $ from 'jquery';
 // import the Button component
 import Button from '../button';
 
-export default class Ipad extends Component {
-//var Ipad = React.createClass({
+import React from "react";
 
+export default class Ipad extends Component {
+	//var Ipad = React.createClass({
+	
 	// a constructor with initial set states
 	constructor(props){
 		super(props);
+		this.state.useCurrentLocation = true;
+		// latitude state
+		this.state.latitute = "";
+		//	longitude state
+		this.state.longitude = "";
+		// current city state
+		this.state.currentCity = "";
+		// current country state
+		this.state.currentCountry = "";
 		// temperature state
 		this.state.temp = "";
-		// button display state
-		this.setState({ display: true });
-    }
+		// weather conditions state
+		this.state.cond = "";
+		// weather icon state
+		this.state.icon = null;
 
-	// a call to fetch weather data via wunderground
-	fetchWeatherData = () => {
-		// API URL with a structure of : ttp://api.wunderground.com/api/key/feature/q/country-code/city.json
-		var url = "http://api.openweathermap.org/data/2.5/weather?q=London&units=metric&APPID=b406cf8ad004accec63c04f51a061e82";
-		$.ajax({
-			url: url,
-			dataType: "jsonp",
-			success : this.parseResponse,
-			error : function(req, err){ console.log('API call failed ' + err); }
-		})
-		// once the data grabbed, hide the button
-		this.setState({ display: false });
 	}
 
+	setLocation(position) {
+		if (this.useCurrentLocation){
+			this.setState({
+				latitude: position.coords.latitude,
+				longitude: position.coords.longitude
+			})
+		}
+	}
+
+	// function to get the current location of the user
+	getLocation() {
+		if (this.state.useCurrentLocation){
+			if (navigator.geolocation) {
+				navigator.geolocation.getCurrentPosition(setLocation);
+			}
+		} else {
+			this.setState({
+				//this is for EGLC, gonna change that so it's different depending on what user selects
+				latitude: 51.5048,
+				longitude: 0.0495
+			})
+		}
+	}
+
+
+
+	//url url : "http://api.openweathermap.org/data/2.5/weather?q=London&units=metric&APPID=b406cf8ad004accec63c04f51a061e82",
+	//function to fetch location, temperature and weather conditions from openweathermap API
+	componentDidMount() {
+		this.getLocation();
+		console.log(this.state.latitude, this.state.longitude)
+		// var url = "http://api.openweathermap.org/data/2.5/weather?q=London&units=metric&APPID=b406cf8ad004accec63c04f51a061e82"
+		var url = "https://api.openweathermap.org/data/2.5/weather?lat="+this.state.latitude+"&lon"+this.state.longitude+"&appid=b406cf8ad004accec63c04f51a061e82"
+		fetch(url)	
+			.then((resp) => resp.json())
+			.then(data => {
+				console.log(data);
+				this.setState({
+					currentCity: data.name,
+					currentCountry: data.sys.country,
+					cond: data.weather[0].description,
+					temp: data.main.temp,
+					icon: "https://openweathermap.org/img/wn/" +data.weather[0].icon+ "@2x.png" 
+				});
+			})
+			console.log("test", this.state.temp)
+	}
+	
+
+
 	// the main render method for the iphone component
-	render() {
+	render() { 
 		// check if temperature data is fetched, if so add the sign styling to the page
 		const tempStyles = this.state.temp ? `${style.temperature} ${style.filled}` : style.temperature;
-
+		const element = document.getElementById("location")
+		if (element){
+			element.addEventListener("change", function(){
+				var selectedValue = this.value;
+				if (selectedValue == "current"){
+					this.state.useCurrentLocation = true;
+				} else { this.state.useCurrentLocation = false;}
+				console.log(selectedValue);
+			});
+		}
+	
 		// display all weather data
 		return (
-			
-			<div class={ style.container }>
+			<div class={style.container}>
+				<header class={style.header}>
+					<span class={style.warning}></span>
+				</header>
 				<div class={style.section}>
-					<div class={ style.city }>{ this.state.currentCity }</div>
-					<div class={ style.conditions }>{ this.state.cond }</div>
-					<span class={ style.temperature }>{ this.state.temp }</span>
+
+					<select name="location" id="location">
+						<option value=""disabled selected>Change Location</option>
+						<option value="current">Current Location</option>
+						<option value="EGLC">EGLC London City Airport</option>
+					</select>
+					<div class={style.city}>{this.state.currentCity}, {this.state.currentCountry}</div>
+					<div class={style.temperature}>{this.state.temp}°C</div>
+					<div class={style.conditions}><img src={this.state.icon}></img></div>
+				</div>
+				<div class={style.section}>
 					<hr></hr>
 				</div>
 				<div class={style.section}>
 					<hr></hr>
 				</div>
-				<div class={style.section}>
-					<hr></hr>
-				</div>
-				<div class={ style.header }>
-					
-					<div class={ style.country }>{ this.state.currentCountry }</div>
-					
-				</div>
-				<div class={ style.details }></div>
-				<div class={ style_ipad.container }>
-					{ this.state.display ? <Button class={ style_ipad.button } clickFunction={ this.fetchWeatherData }/ > : null }
-				</div>
+				<div class={style.details}></div>
 			</div>
 		);
 	}
 
-	parseResponse = (parsed_json) => {
-		var city = parsed_json['name'];
-		var country = parsed_json['sys']['country'];
-		var temp_c = parsed_json['main']['temp'];
-		var conditions = parsed_json['weather']['0']['description'];
-
-		// set the states for fields so they could be rendered later on
-		this.setState({
-			currentCity: city,
-			currentCountry: country,
-			temp: temp_c,
-			cond : conditions
-		});      
-	}
 }
+
+// "coord":{"lon":-0.1257,"lat":51.5085},
+// 	"weather":[{"id":804,"main":"Clouds","description":"overcast clouds","icon":"04d"}],
+// 	"base":"stations",
+// 	"main":{"temp":8.4,"feels_like":5.74,"temp_min":7.35,"temp_max":9.82,"pressure":1015,"humidity":61},
+// 	"visibility":10000,
+// 	"wind":{"speed":4.63,"deg":170},
+// 	"clouds":{"all":100},"dt":1678885703,
+// 	"sys":{"type":2,"id":2075535,"country":"GB","sunrise":1678860938,"sunset":1678903415},
+// 	"timezone":0,
+// 	"id":2643743,
+// 	"name":"London",
+// 	"cod":200
