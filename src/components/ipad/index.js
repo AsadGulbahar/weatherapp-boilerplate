@@ -8,32 +8,27 @@ import $ from 'jquery';
 // import the Button component
 import Button from '../button';
 
-import React from 'react';
-
 export default class Ipad extends Component {
 	//var Ipad = React.createClass({
 	
 	// a constructor with initial set states
 	constructor(props){
 		super(props);
-		this.state = {
-			// use current location state
-			useCurrentLocation: true,
-			// latitude state
-			latitute: "",
-			//	longitude state
-			longitude: "",
-			// current city state
-			currentCity: "",
-			// current country state
-			currentCountry: "",
-			// temperature state
-			temp: "",
-			// weather conditions state
-			cond: "",
-			// weather icon state
-			icon: null
-		};
+		this.state.useCurrentLocation = true;
+		// latitude state
+		this.state.latitute = "";
+		//	longitude state
+		this.state.longitude = "";
+		// current city state
+		this.state.currentCity = "";
+		// current country state
+		this.state.currentCountry = "";
+		// temperature state
+		this.state.temp = "";
+		// weather conditions state
+		this.state.cond = "";
+		// weather icon state
+		this.state.icon = null;
 	}
 
 	setLocation(position) {
@@ -48,27 +43,31 @@ export default class Ipad extends Component {
 				longitude: 0.0495
 			})
 		}
+		render();
 	}
 
 	// function to get the current location of the user
 	getLocation() {
-		if (navigator.geolocation) {
-			navigator.geolocation.getCurrentPosition(
-			(position) => this.setLocation(position),
-			(e) => {
-				console.log("getLocation error: ", e);
-			});
+		if (window.navigator.geolocation) {
+		  	window.navigator.geolocation.getCurrentPosition(
+				this.setLocation.bind(this),
+				(e) => {
+					console.log("getLocation error: ", e);
+				}
+		  	);	
 		} else {
-			console.log("navigator not supported");
+		  	console.log("navigator not supported");
 		}
 	}
 
 
+	//url url : "http://api.openweathermap.org/data/2.5/weather?q=London&units=metric&APPID=b406cf8ad004accec63c04f51a061e82",
 	//function to fetch location, temperature and weather conditions from openweathermap API
 	componentDidMount() {
 		this.getLocation();
-		console.log(this.state.latitute, this.state.longitude)
-		var url = "https://api.openweathermap.org/data/2.5/weather?lat="+this.state.latitute+"&lon="+this.state.longitude+"&appid=b406cf8ad004accec63c04f51a061e82"
+		console.log(this.state.latitude, this.state.longitude)
+		// var url = "http://api.openweathermap.org/data/2.5/weather?q=London&units=metric&APPID=b406cf8ad004accec63c04f51a061e82"
+		var url = "https://api.openweathermap.org/data/2.5/weather?lat="+this.state.latitude+"&lon="+this.state.longitude+"&appid=b406cf8ad004accec63c04f51a061e82"
 		fetch(url)	
 			.then((resp) => resp.json())
 			.then(data => {
@@ -129,6 +128,7 @@ export default class Ipad extends Component {
 			</div>
 		);
 	}
+
 }
 
 // "coord":{"lon":-0.1257,"lat":51.5085},
