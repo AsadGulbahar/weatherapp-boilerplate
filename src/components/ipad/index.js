@@ -41,12 +41,24 @@ export default class Ipad extends Component {
 
 		// display all weather data
 		return (
+			
 			<div class={ style.container }>
-				<div class={ style.header }>
+				<div class={style.section}>
 					<div class={ style.city }>{ this.state.currentCity }</div>
-					<div class={ style.country }>{ this.state.currentCountry }</div>
 					<div class={ style.conditions }>{ this.state.cond }</div>
 					<span class={ style.temperature }>{ this.state.temp }</span>
+					<hr></hr>
+				</div>
+				<div class={style.section}>
+					<hr></hr>
+				</div>
+				<div class={style.section}>
+					<hr></hr>
+				</div>
+				<div class={ style.header }>
+					
+					<div class={ style.country }>{ this.state.currentCountry }</div>
+					
 				</div>
 				<div class={ style.details }></div>
 				<div class={ style_ipad.container }>
