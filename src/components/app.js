@@ -11,13 +11,13 @@ export default class App extends Component {
 	// once the components are loaded, checks if the url bar has a path with "ipad" in it, if so sets state of tablet to be true
 	componentDidMount() {
 		const urlBar = window.location.href;
-		if(urlBar.includes("ipad")) {
+		if(urlBar.includes("iphone")) {
 			this.setState({
-				"isTablet": true
+				"isTablet": false
 			});
 		} else {
 			this.setState({
-				"isTablet": false
+				"isTablet": true
 			});
 		}
 	}
