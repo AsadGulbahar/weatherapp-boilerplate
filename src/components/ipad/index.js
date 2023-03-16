@@ -68,7 +68,7 @@ export default class Ipad extends Component {
 					(position) => {
 						if (position != null){
 							console.log(position.coords.latitude, position.coords.longitude)
-							const url = `https://api.openweathermap.org/data/2.5/weather?lat=${position.coords.latitude}&lon=${position.coords.longitude}&appid=b406cf8ad004accec63c04f51a061e82&units=metric`
+							const url = `https://api.openweathermap.org/data/2.5/weather?lat=${position.coords.latitude}&lon=${position.coords.longitude}&appid=6ef7ec3fa00303e0f850f2f7d7ed228f&units=metric`
 							console.log(url)
 							fetch(url)	
 								.then((resp) => resp.json())
@@ -82,7 +82,6 @@ export default class Ipad extends Component {
 										icon: "https://openweathermap.org/img/wn/" +data.weather[0].icon+ "@2x.png" 
 									});
 								})
-								console.log("test", this.state.temp)
 						} else {console.log("position is null")}
 						
 					} ,(e) => {	
@@ -93,10 +92,23 @@ export default class Ipad extends Component {
 				console.log("navigator not supported");
 			}
 		} else {
-		this.setState({
-			latitude: 51.5048,
-			longitude: 0.0495
-			})
+			const latitude = 41.652355
+			const longitude = -4.743492
+			
+			const url = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=6ef7ec3fa00303e0f850f2f7d7ed228f&units=metric`
+			console.log(url)
+			fetch(url)	
+				.then((resp) => resp.json())
+				.then(data => {
+					console.log(data);
+					this.setState({
+						currentCity: data.name,
+						currentCountry: data.sys.country,
+						cond: data.weather[0].description,
+						temp: data.main.temp,
+						icon: "https://openweathermap.org/img/wn/" +data.weather[0].icon+ "@2x.png" 
+					});
+				})
 		}
 		console.log(this.state.latitude, this.state.longitude)
 
