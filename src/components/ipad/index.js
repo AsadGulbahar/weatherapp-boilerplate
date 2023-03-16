@@ -14,7 +14,7 @@ export default class Ipad extends Component {
 	// a constructor with initial set states
 	constructor(props){
 		super(props);
-		this.state.useCurrentLocation = true;
+		this.state.locationUsed = "current";
 		// latitude state
 		this.state.latitute = "";
 		//	longitude state
@@ -32,7 +32,7 @@ export default class Ipad extends Component {
 	}
 
 	setLocation(position) {
-		if (this.state.useCurrentLocation){
+		if (this.state.locationUsed == "current"){
 			this.setState({
 				latitude: position.coords.latitude,
 				longitude: position.coords.longitude
@@ -59,12 +59,10 @@ export default class Ipad extends Component {
 		}
 	}
 
-
-	//url url : "http://api.openweathermap.org/data/2.5/weather?q=London&units=metric&APPID=b406cf8ad004accec63c04f51a061e82",
 	//function to fetch location, temperature and weather conditions from openweathermap API
 	componentDidMount() {
 
-		if (this.state.useCurrentLocation){
+		if (this.state.locationUsed == "current"){
 			if (window.navigator.geolocation) {
 				window.navigator.geolocation.getCurrentPosition(		
 					(position) => {
@@ -104,24 +102,30 @@ export default class Ipad extends Component {
 
 	}
 	
+	// func() {
+	// 	const element = document.getElementById("location")
+	// 	if (element) {
+	// 	  element.addEventListener("change", (event) => {
+	// 		var selectedValue = event.target.value;
+	// 		console.log(selectedValue)
+	// 		this.setState({locationUsed: selectedValue});
+	// 		this.componentDidMount();
+	// 	  });
+	// 	}
+	// }
+
+	handleLocationChange = (event) => {
+		var selectedValue = event.target.value;
+		console.log(selectedValue)
+		this.setState({locationUsed: selectedValue});
+		this.componentDidMount();
+	};
+	  
+	
 	// the main render method for the ipad component
 	render() { 
 		// check if temperature data is fetched, if so add the sign styling to the page
 		const tempStyles = this.state.temp ? `${style.temperature} ${style.filled}` : style.temperature;
-		
-		const element = document.getElementById("location")
-		if (element){
-			element.addEventListener("change", function(){
-				var selectedValue = this.value;
-				console.log(selectedValue)
-				if (selectedValue == "current"){
-					this.setState({useCurrentLocation: true});
-				} else { this.setState({useCurrentLocation: false});}
-				console.log(selectedValue);
-			this.componentDidMount();
-			});
-		}
-
 	
 		// display all weather data
 		return (
@@ -131,11 +135,12 @@ export default class Ipad extends Component {
 				</header>
 				<div class={style.section}>
 
-					<select name="location" id="location">
+					<select name="location" id="location" onChange={this.handleLocationChange}>
 						<option value=""disabled selected>Change Location</option>
 						<option value="current">Current Location</option>
 						<option value="EGLC">EGLC London City Airport</option>
 					</select>
+
 					<div class={style.city}>{this.state.currentCity}, {this.state.currentCountry}</div>
 					<div class={style.temperature}>{this.state.temp}°C</div>
 					<div class={style.conditions}><img src={this.state.icon}></img></div>
