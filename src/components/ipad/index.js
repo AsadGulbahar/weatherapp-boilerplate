@@ -43,7 +43,6 @@ export default class Ipad extends Component {
 				longitude: 0.0495
 			})
 		}
-		render();
 	}
 
 	// function to get the current location of the user
@@ -64,31 +63,52 @@ export default class Ipad extends Component {
 	//url url : "http://api.openweathermap.org/data/2.5/weather?q=London&units=metric&APPID=b406cf8ad004accec63c04f51a061e82",
 	//function to fetch location, temperature and weather conditions from openweathermap API
 	componentDidMount() {
-		this.getLocation();
-		console.log(this.state.latitude, this.state.longitude)
-		// var url = "http://api.openweathermap.org/data/2.5/weather?q=London&units=metric&APPID=b406cf8ad004accec63c04f51a061e82"
-		var url = "https://api.openweathermap.org/data/2.5/weather?lat="+this.state.latitude+"&lon="+this.state.longitude+"&appid=b406cf8ad004accec63c04f51a061e82"
-		fetch(url)	
-			.then((resp) => resp.json())
-			.then(data => {
-				console.log(data);
-				this.setState({
-					currentCity: data.name,
-					currentCountry: data.sys.country,
-					cond: data.weather[0].description,
-					temp: data.main.temp,
-					icon: "https://openweathermap.org/img/wn/" +data.weather[0].icon+ "@2x.png" 
-				});
+
+		if (this.state.useCurrentLocation){
+			if (window.navigator.geolocation) {
+				window.navigator.geolocation.getCurrentPosition(		
+					(position) => {
+						if (position != null){
+							console.log(position.coords.latitude, position.coords.longitude)
+							const url = `https://api.openweathermap.org/data/2.5/weather?lat=${position.coords.latitude}&lon=${position.coords.longitude}&appid=b406cf8ad004accec63c04f51a061e82&units=metric`
+							console.log(url)
+							fetch(url)	
+								.then((resp) => resp.json())
+								.then(data => {
+									console.log(data);
+									this.setState({
+										currentCity: data.name,
+										currentCountry: data.sys.country,
+										cond: data.weather[0].description,
+										temp: data.main.temp,
+										icon: "https://openweathermap.org/img/wn/" +data.weather[0].icon+ "@2x.png" 
+									});
+								})
+								console.log("test", this.state.temp)
+						} else {console.log("position is null")}
+						
+					} ,(e) => {	
+						console.log("geolocation error: ", e);
+					}
+				);
+			} else {
+				console.log("navigator not supported");
+			}
+		} else {
+		this.setState({
+			latitude: 51.5048,
+			longitude: 0.0495
 			})
-			console.log("test", this.state.temp)
+		}
+		console.log(this.state.latitude, this.state.longitude)
+
 	}
 	
-
-
 	// the main render method for the ipad component
 	render() { 
 		// check if temperature data is fetched, if so add the sign styling to the page
 		const tempStyles = this.state.temp ? `${style.temperature} ${style.filled}` : style.temperature;
+		
 		const element = document.getElementById("location")
 		if (element){
 			element.addEventListener("change", function(){
@@ -98,8 +118,10 @@ export default class Ipad extends Component {
 					this.setState({useCurrentLocation: true});
 				} else { this.setState({useCurrentLocation: false});}
 				console.log(selectedValue);
+			this.componentDidMount();
 			});
 		}
+
 	
 		// display all weather data
 		return (
