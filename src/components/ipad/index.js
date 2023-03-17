@@ -7,6 +7,8 @@ import style_ipad from '../button/style_ipad';
 import $ from 'jquery';
 // import the Button component
 import Button from '../button';
+// import PapaParse for CSV parsing
+import Papa from 'papaparse';
 
 export default class Ipad extends Component {
 	//var Ipad = React.createClass({
@@ -30,6 +32,7 @@ export default class Ipad extends Component {
 		// weather icon state
 		this.state.icon = null;
 	}
+
 
 	setLocation(position) {
 		if (this.state.locationUsed == "current"){
@@ -59,9 +62,37 @@ export default class Ipad extends Component {
 		}
 	}
 
-	//function to fetch location, temperature and weather conditions from openweathermap API
-	componentDidMount() {
 
+
+	// parse airports.csv file into array
+	parseAirports() {
+		console.log("parsing airports")
+		var airports = [];
+		$.ajax({
+			type: "GET",
+			url: "/components/ipad/airports.csv",
+			dataType: "text",
+			success: function(data) {processData(data);}
+		});
+		function processData(allText) {
+			var allTextLines = allText.split(/\r\n|\n/);
+			var headers = allTextLines[0].split(',');
+			for (var i=1; i<allTextLines.length; i++) {
+				var data = allTextLines[i].split(',');
+				if (data.length == headers.length) {
+					var tarr = [];
+					for (var j=0; j<headers.length; j++) {
+						tarr.push(data[j]);
+					}
+					airports.push(tarr);
+				}
+			}
+			console.log(airports);
+		}
+	}
+
+	// function to fetch location, temperature and weather conditions from openweathermap API
+	readFromAPI(){
 		if (this.state.locationUsed == "current"){
 			if (window.navigator.geolocation) {
 				window.navigator.geolocation.getCurrentPosition(		
@@ -110,35 +141,35 @@ export default class Ipad extends Component {
 					});
 				})
 		}
-		console.log(this.state.latitude, this.state.longitude)
-
 	}
-	
-	// func() {
-	// 	const element = document.getElementById("location")
-	// 	if (element) {
-	// 	  element.addEventListener("change", (event) => {
-	// 		var selectedValue = event.target.value;
-	// 		console.log(selectedValue)
-	// 		this.setState({locationUsed: selectedValue});
-	// 		this.componentDidMount();
-	// 	  });
-	// 	}
-	// }
+
+	componentDidMount() {
+		this.parseAirports();
+		this.readFromAPI();
+	}
 
 	handleLocationChange = (event) => {
 		var selectedValue = event.target.value;
 		console.log(selectedValue)
 		this.setState({locationUsed: selectedValue});
-		this.componentDidMount();
+		this.readFromAPI();
 	};
-	  
+
+	onItemSelected = (option) => {
+		onChange !== undefined && onChange(option.key);
+		onChange !== undefined && setInputValue(option.value);
+		setOpen(false);
+	}
 	
 	// the main render method for the ipad component
 	render() { 
 		// check if temperature data is fetched, if so add the sign styling to the page
 		const tempStyles = this.state.temp ? `${style.temperature} ${style.filled}` : style.temperature;
-	
+
+		// const [inputValue, setInputValue] = useState("");
+
+
+
 		// display all weather data
 		return (
 			<div class={style.container}>
@@ -147,11 +178,30 @@ export default class Ipad extends Component {
 				</header>
 				<div class={style.section}>
 
-					<select name="location" id="location" onChange={this.handleLocationChange}>
+					
+
+
+					{/* <select name="location" id="location" onChange={this.handleLocationChange}>
 						<option value=""disabled selected>Change Location</option>
 						<option value="current">Current Location</option>
 						<option value="EGLC">EGLC London City Airport</option>
-					</select>
+					</select> */}
+					<div class="dropdown-container">
+						<div class="input-container">
+							<input type="text" placeholder="Change Location" onChange={this.handleLocationChange}/>
+							<div class="input-arrow-container">
+								<i class="input-arrow"></i>
+							</div>
+						</div>
+						{/* <div class="dropdown">
+							<div class="option">Current Location</div>
+							{
+								options.map(option) => {
+									return ( <div class="option" key = {option.key} onClick={() => this.onItemSelected(option)} >{option}</div>)
+								}
+							}
+						</div> */}
+					</div>
 
 					<div class={style.city}>{this.state.currentCity}, {this.state.currentCountry}</div>
 					<div class={style.temperature}>{this.state.temp}°C</div>
@@ -170,7 +220,7 @@ export default class Ipad extends Component {
 
 }
 
-// "coord":{"lon":-0.1257,"lat":51.5085},
+{/* // "coord":{"lon":-0.1257,"lat":51.5085},
 // 	"weather":[{"id":804,"main":"Clouds","description":"overcast clouds","icon":"04d"}],
 // 	"base":"stations",
 // 	"main":{"temp":8.4,"feels_like":5.74,"temp_min":7.35,"temp_max":9.82,"pressure":1015,"humidity":61},
@@ -181,4 +231,4 @@ export default class Ipad extends Component {
 // 	"timezone":0,
 // 	"id":2643743,
 // 	"name":"London",
-// 	"cod":200
+// 	"cod":200 */}
