@@ -59,14 +59,6 @@ export default class Ipad extends Component {
 		}
 	}
 
-	func(){
-		
-		
-	}
-
-	
-  
-
 	//function to fetch location, temperature and weather conditions from openweathermap API
 	componentDidMount() {
 
@@ -100,7 +92,8 @@ export default class Ipad extends Component {
 				console.log("navigator not supported");
 			}
 		} else {
-			this.state.locationUsed;
+			const latitude = 41.652355
+			const longitude = -4.743492
 			
 			const url = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=6ef7ec3fa00303e0f850f2f7d7ed228f&units=metric`
 			console.log(url)
