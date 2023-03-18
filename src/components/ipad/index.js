@@ -4,37 +4,11 @@ import { h, render, Component } from 'preact';
 import style from './style';
 import style_ipad from '../button/style_ipad';
 // import jquery for API calls
-import $, { queue } from 'jquery';
+import $ from 'jquery';
 // import the Button component
 import Button from '../button';
 // import PapaParse for CSV parsing
 import Papa from 'papaparse';
-
-// simple cache data structure
-class Cache {
-	constructor() {
-		this.inArray = [];
-		this.len = 0;
-	}
-
-	add = (item) => {
-		if (this.len == 20){
-			this.inArray.shift();
-		}
-		this.inArray.push(item);
-		this.len++;
-	}
-
-	get = (item) => {	
-		if (this.inArray.includes(item)){
-			this.inArray = this.inArray.filter((e) => e != item);
-			this.add(item);
-			return item;
-		} else {
-			return false;
-		}
-	}
-}
 
 export default class Ipad extends Component {
 	//var Ipad = React.createClass({
@@ -63,8 +37,6 @@ export default class Ipad extends Component {
 		this.state.airportName = "";
 		// airports hash map
 		this.state.airports = new Map();
-		// airports cache
-		this.state.airportsCache = new Cache();
 
 	}
 
@@ -76,24 +48,15 @@ export default class Ipad extends Component {
 				longitude: position.coords.longitude
 			})
 		} else {
+			this.setState({airportCode: this.state.locationUsed})
+			this.setState({
+				airportName: this.state.airports.get(this.state.airportCode)[0],
+				latitude: this.state.airports.get(this.state.airportCode)[1],
+				longitude: this.state.airports.get(this.state.airportCode)[2]
+			})
 		}
+		console.log("latitude: ", this.state.latitude, "longitude: ", this.state.longitude)
 	}
-
-	// function to get the current location of the user
-	getLocation() {
-		if (window.navigator.geolocation) {
-		  	window.navigator.geolocation.getCurrentPosition(
-				this.setCoords.bind(this),
-				(e) => {
-					console.log("getLocation error: ", e);
-				}
-		  	);	
-		} else {
-		  	console.log("navigator not supported");
-		}
-	}
-
-
 
 	// parse airports.csv file into hash table
 	parseAirports = () => {
@@ -156,17 +119,15 @@ export default class Ipad extends Component {
 				console.log("navigator not supported");
 			}
 		} else {
-			const latitude = 41.652355
-			const longitude = -4.743492
 			
-			const url = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=6ef7ec3fa00303e0f850f2f7d7ed228f&units=metric`
+			const url = `https://api.openweathermap.org/data/2.5/weather?lat=${this.state.latitude}&lon=${this.state.longitude}&appid=6ef7ec3fa00303e0f850f2f7d7ed228f&units=metric`
 			console.log(url)
 			fetch(url)	
 				.then((resp) => resp.json())
 				.then(data => {
 					console.log(data);
 					this.setState({
-						currentCity: data.name,
+						currentCity: this.state.airportName + ", " + data.name,
 						currentCountry: data.sys.country,
 						cond: data.weather[0].description,
 						temp: data.main.temp,
@@ -183,17 +144,18 @@ export default class Ipad extends Component {
 
 	handleLocationChange = (event) => {
 		var selectedValue = event.target.value;
-		console.log(selectedValue)
-		this.setState({locationUsed: selectedValue});
-		this.setCoords();
+		if (selectedValue == "current") {
+			this.setState({locationUsed: "current"});
+		} else if (this.state.airports.has(selectedValue)){
+			console.log(selectedValue)
+			this.setState({locationUsed: selectedValue});
+			this.setCoords();
+		} else {
+			this.setState({locationUsed: "current"});
+			window.alert("Please select a valid airport code or type current for your current location.");
+		}
 		this.readFromAPI();
 	};
-
-	onItemSelected = (option) => {
-		onChange !== undefined && onChange(option.key);
-		onChange !== undefined && setInputValue(option.value);
-		setOpen(false);
-	}
 	
 	// the main render method for the ipad component
 	render() { 
@@ -223,9 +185,9 @@ export default class Ipad extends Component {
 					<div class="dropdown-container">
 						<div class="input-container">
 							<input type="text" placeholder="Change Location" onChange={this.handleLocationChange}/>
-							<div class="input-arrow-container">
+							{/* <div class="input-arrow-container">
 								<i class="input-arrow"></i>
-							</div>
+							</div> */}
 						</div>
 						{/* <div class="dropdown">
 							<div class="option">Current Location</div>
