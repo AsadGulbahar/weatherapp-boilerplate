@@ -118,8 +118,7 @@ export default class Ipad extends Component {
 			} else {
 				console.log("navigator not supported");
 			}
-		} else {
-			
+		} else if (this.state.airports.has(this.state.locationUsed)) {
 			const url = `https://api.openweathermap.org/data/2.5/weather?lat=${this.state.latitude}&lon=${this.state.longitude}&appid=6ef7ec3fa00303e0f850f2f7d7ed228f&units=metric`
 			console.log(url)
 			fetch(url)	
@@ -134,9 +133,28 @@ export default class Ipad extends Component {
 						icon: "https://openweathermap.org/img/wn/" +data.weather[0].icon+ "@2x.png" 
 					});
 				})
+		} else {
+			const url = `https://api.openweathermap.org/data/2.5/weather?q=${this.state.locationUsed}&appid=6ef7ec3fa00303e0f850f2f7d7ed228f&units=metric`
+			console.log(url)
+			fetch(url)	
+			.then((resp) => resp.json())
+			.then(data => {
+				console.log(data);
+				if (data.cod == "404"){
+					window.alert("Please enter a valid airport code or city name. Enter 'current' to use your current location.")
+				} else {
+					this.setState({
+						currentCity: data.name,
+						currentCountry: data.sys.country,
+						cond: data.weather[0].description,
+						temp: data.main.temp,
+						icon: "https://openweathermap.org/img/wn/" +data.weather[0].icon+ "@2x.png" 
+					});
+				}
+				
+			})
 		}
 	}
-
 	componentDidMount() {
 		this.parseAirports();
 		this.readFromAPI();
@@ -144,15 +162,11 @@ export default class Ipad extends Component {
 
 	handleLocationChange = (event) => {
 		var selectedValue = event.target.value;
-		if (selectedValue == "current") {
-			this.setState({locationUsed: "current"});
-		} else if (this.state.airports.has(selectedValue)){
+		this.setState({locationUsed: selectedValue});
+		if (this.state.airports.has(selectedValue.toUpperCase())){
+			this.setState({locationUsed: selectedValue.toUpperCase()});
 			console.log(selectedValue)
-			this.setState({locationUsed: selectedValue});
 			this.setCoords();
-		} else {
-			this.setState({locationUsed: "current"});
-			window.alert("Please select a valid airport code or type current for your current location.");
 		}
 		this.readFromAPI();
 	};
