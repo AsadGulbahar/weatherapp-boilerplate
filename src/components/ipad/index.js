@@ -4,11 +4,37 @@ import { h, render, Component } from 'preact';
 import style from './style';
 import style_ipad from '../button/style_ipad';
 // import jquery for API calls
-import $ from 'jquery';
+import $, { queue } from 'jquery';
 // import the Button component
 import Button from '../button';
 // import PapaParse for CSV parsing
 import Papa from 'papaparse';
+
+// simple cache data structure
+class Cache {
+	constructor() {
+		this.inArray = [];
+		this.len = 0;
+	}
+
+	add = (item) => {
+		if (this.len == 20){
+			this.inArray.shift();
+		}
+		this.inArray.push(item);
+		this.len++;
+	}
+
+	get = (item) => {	
+		if (this.inArray.includes(item)){
+			this.inArray = this.inArray.filter((e) => e != item);
+			this.add(item);
+			return item;
+		} else {
+			return false;
+		}
+	}
+}
 
 export default class Ipad extends Component {
 	//var Ipad = React.createClass({
@@ -31,20 +57,25 @@ export default class Ipad extends Component {
 		this.state.cond = "";
 		// weather icon state
 		this.state.icon = null;
+		// airport code state
+		this.state.airportCode = "";
+		// airport name state
+		this.state.airportName = "";
+		// airports hash map
+		this.state.airports = new Map();
+		// airports cache
+		this.state.airportsCache = new Cache();
+
 	}
 
-
-	setLocation(position) {
+	// a call to set the latitude and longitude states
+	setCoords(position) {
 		if (this.state.locationUsed == "current"){
 			this.setState({
 				latitude: position.coords.latitude,
 				longitude: position.coords.longitude
 			})
 		} else {
-			this.setState({
-				latitude: 51.5048,
-				longitude: 0.0495
-			})
 		}
 	}
 
@@ -52,7 +83,7 @@ export default class Ipad extends Component {
 	getLocation() {
 		if (window.navigator.geolocation) {
 		  	window.navigator.geolocation.getCurrentPosition(
-				this.setLocation.bind(this),
+				this.setCoords.bind(this),
 				(e) => {
 					console.log("getLocation error: ", e);
 				}
@@ -64,32 +95,34 @@ export default class Ipad extends Component {
 
 
 
-	// parse airports.csv file into array
-	parseAirports() {
+	// parse airports.csv file into hash table
+	parseAirports = () => {
 		console.log("parsing airports")
-		var airports = [];
+		var airports = new Map();
 		$.ajax({
-			type: "GET",
-			url: "/components/ipad/airports.csv",
-			dataType: "text",
-			success: function(data) {processData(data);}
+		  type: "GET",
+		  url: "/components/ipad/airports.csv",
+		  dataType: "text",
+		  success: (data) => {processData(data);}
 		});
-		function processData(allText) {
-			var allTextLines = allText.split(/\r\n|\n/);
-			var headers = allTextLines[0].split(',');
-			for (var i=1; i<allTextLines.length; i++) {
-				var data = allTextLines[i].split(',');
-				if (data.length == headers.length) {
-					var tarr = [];
-					for (var j=0; j<headers.length; j++) {
-						tarr.push(data[j]);
-					}
-					airports.push(tarr);
-				}
+		const processData = (allText) => {
+		  var allTextLines = allText.split(/\r\n|\n/);
+		  var headers = allTextLines[0].split(',');
+		  for (var i=1; i<allTextLines.length; i++) {
+			var data = allTextLines[i].split(',');
+			if (data.length == headers.length) {
+			  var airportInfo = [];
+			  airportInfo.push(data[2]); // airport name
+			  airportInfo.push(data[3]); // latitude
+			  airportInfo.push(data[4]); // longitude
+			  airports.set(data[0], airportInfo); // airport code & airport info
 			}
-			console.log(airports);
+		  }
+		  this.setState({airports: airports});
+		  console.log(this.state.airports);
 		}
 	}
+	  
 
 	// function to fetch location, temperature and weather conditions from openweathermap API
 	readFromAPI(){
@@ -152,6 +185,7 @@ export default class Ipad extends Component {
 		var selectedValue = event.target.value;
 		console.log(selectedValue)
 		this.setState({locationUsed: selectedValue});
+		this.setCoords();
 		this.readFromAPI();
 	};
 
