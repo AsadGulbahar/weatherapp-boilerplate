@@ -21,10 +21,8 @@ export default class Ipad extends Component {
 		this.state.latitute = "";
 		//	longitude state
 		this.state.longitude = "";
-		// current city state
-		this.state.currentCity = "";
-		// current country state
-		this.state.currentCountry = "";
+		// current location state
+		this.state.location = "";
 		// temperature state
 		this.state.temp = "";
 		// weather conditions state
@@ -85,30 +83,48 @@ export default class Ipad extends Component {
 		  console.log(this.state.airports);
 		}
 	}
-	  
+	
+	readFromAPI(url){
+		console.log(url)
+		fetch(url)	
+		.then((resp) => resp.json())
+		.then(data => {
+			console.log(data);
+			if (data.cod == "400" || data.cod == "404"){
+				window.alert("Please enter a valid airport code or city name. Enter 'current' to use your current location.")
+			} else {
+				let location = "";
+				let condition = "";
+				let temperature = "";
+				if (this.state.airports.has(this.state.locationUsed)){
+					location = this.state.airportCode + " " + this.state.airportName + ", " + data.name + ", " + data.sys.country
+					condition = data.weather[0].description
+					temperature = data.main.temp + "°C"
+				} else {
+					location = data.name + ", " + data.sys.country
+					condition = data.weather[0].description
+					temperature = data.main.temp + "°C"
+				}
+				this.setState({
+					loc: location,
+					cond: condition,
+					temp: temperature,
+					icon: "https://openweathermap.org/img/wn/" +data.weather[0].icon+ "@2x.png" 
+				});
+			}
+		})
+	}
 
 	// function to fetch location, temperature and weather conditions from openweathermap API
-	readFromAPI(){
+	getURL(){
+		let url = `https://api.openweathermap.org/data/2.5/weather?appid=b406cf8ad004accec63c04f51a061e82&units=metric`;
 		if (this.state.locationUsed == "current"){
 			if (window.navigator.geolocation) {
 				window.navigator.geolocation.getCurrentPosition(		
 					(position) => {
 						if (position != null){
-							console.log(position.coords.latitude, position.coords.longitude)
-							const url = `https://api.openweathermap.org/data/2.5/weather?lat=${position.coords.latitude}&lon=${position.coords.longitude}&appid=6ef7ec3fa00303e0f850f2f7d7ed228f&units=metric`
-							console.log(url)
-							fetch(url)	
-								.then((resp) => resp.json())
-								.then(data => {
-									console.log(data);
-									this.setState({
-										currentCity: data.name,
-										currentCountry: data.sys.country,
-										cond: data.weather[0].description,
-										temp: data.main.temp,
-										icon: "https://openweathermap.org/img/wn/" +data.weather[0].icon+ "@2x.png" 
-									});
-								})
+							url += `&lat=${position.coords.latitude}&lon=${position.coords.longitude}`
+							this.readFromAPI(url);
 						} else {console.log("position is null")}
 						
 					} ,(e) => {	
@@ -119,45 +135,17 @@ export default class Ipad extends Component {
 				console.log("navigator not supported");
 			}
 		} else if (this.state.airports.has(this.state.locationUsed)) {
-			const url = `https://api.openweathermap.org/data/2.5/weather?lat=${this.state.latitude}&lon=${this.state.longitude}&appid=6ef7ec3fa00303e0f850f2f7d7ed228f&units=metric`
-			console.log(url)
-			fetch(url)	
-				.then((resp) => resp.json())
-				.then(data => {
-					console.log(data);
-					this.setState({
-						currentCity: this.state.airportName + ", " + data.name,
-						currentCountry: data.sys.country,
-						cond: data.weather[0].description,
-						temp: data.main.temp,
-						icon: "https://openweathermap.org/img/wn/" +data.weather[0].icon+ "@2x.png" 
-					});
-				})
+			url += `&lat=${this.state.latitude}&lon=${this.state.longitude}`
+			this.readFromAPI(url);
 		} else {
-			const url = `https://api.openweathermap.org/data/2.5/weather?q=${this.state.locationUsed}&appid=6ef7ec3fa00303e0f850f2f7d7ed228f&units=metric`
-			console.log(url)
-			fetch(url)	
-			.then((resp) => resp.json())
-			.then(data => {
-				console.log(data);
-				if (data.cod == "404"){
-					window.alert("Please enter a valid airport code or city name. Enter 'current' to use your current location.")
-				} else {
-					this.setState({
-						currentCity: data.name,
-						currentCountry: data.sys.country,
-						cond: data.weather[0].description,
-						temp: data.main.temp,
-						icon: "https://openweathermap.org/img/wn/" +data.weather[0].icon+ "@2x.png" 
-					});
-				}
-				
-			})
+			url += `&q=${this.state.locationUsed}`
+			this.readFromAPI(url);
 		}
 	}
+
 	componentDidMount() {
 		this.parseAirports();
-		this.readFromAPI();
+		this.getURL();
 	}
 
 	handleLocationChange = (event) => {
@@ -168,7 +156,7 @@ export default class Ipad extends Component {
 			console.log(selectedValue)
 			this.setCoords();
 		}
-		this.readFromAPI();
+		this.getURL();
 	};
 	
 	// the main render method for the ipad component
@@ -213,8 +201,8 @@ export default class Ipad extends Component {
 						</div> */}
 					</div>
 
-					<div class={style.city}>{this.state.currentCity}, {this.state.currentCountry}</div>
-					<div class={style.temperature}>{this.state.temp}°C</div>
+					<div class={style.city}>{this.state.loc}</div>
+					<div class={style.temperature}>{this.state.temp}</div>
 					<div class={style.conditions}><img src={this.state.icon}></img></div>
 				</div>
 				<div class={style.section}>
@@ -223,7 +211,9 @@ export default class Ipad extends Component {
 				<div class={style.section}>
 					<hr></hr>
 				</div>
-				<div class={style.details}></div>
+				<div class={style.details}>
+					<hr></hr>
+				</div>
 			</div>
 		);
 	}
