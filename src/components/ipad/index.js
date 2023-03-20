@@ -197,7 +197,7 @@ export default class Ipad extends Component {
 			this.readFromAPI(url, forecasturl);
 		} else {
 			url += `&q=${this.state.locationUsed}`
-			forecast += `&q=${this.state.locationUsed}`
+			forecasturl += `&q=${this.state.locationUsed}`
 			this.readFromAPI(url, forecasturl);
 		}
 	}
