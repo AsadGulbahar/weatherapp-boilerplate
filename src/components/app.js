@@ -2,7 +2,6 @@
 import { h, Component } from 'preact';
 
 // import required Components from 'components/'
-import Iphone from './iphone';
 import Ipad from './ipad';
 
 export default class App extends Component {

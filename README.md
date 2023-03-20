@@ -75,7 +75,7 @@ npm start
 
 ## Quick Boilerplate Overview
 
-- The initial run will display the iPhone version (iPhone 6/7 Plus screen size); however, if you modify the path on the url bar by adding "/ipad", you can view the tablet version (iPad Air screen size).
+- The initial run will display the tablet version (iPad Air screen size).
 
 - The CSS pre-processor in use is Less. You don't have to worry about the syntax and just write in normal CSS as there are helper modules to assist you (located in `style/helpers`).
 
