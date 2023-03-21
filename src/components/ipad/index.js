@@ -255,7 +255,13 @@ export default class Ipad extends Component {
 		// display all weather data
 		return (
 			<div class={style.container}>
-				<Header />
+				<Header 
+					temp = {this.state.temp}
+                    clouds = {this.state.clouds}
+                    pressure = {this.state.pressure}
+                    humidity = {this.state.humidity}
+                    wind = {this.state.windSp}
+				/>
 				<Section1 
 					handleChange = {this.handleLocationChange}
 					location = {this.state.loc} 

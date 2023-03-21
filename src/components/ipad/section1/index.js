@@ -18,9 +18,12 @@ export default class Section1 extends Component{
                             <div class={style.conditions}><img src={this.props.icon}></img></div>
                         </div>
                         <div class={style.datetime}>
-                            <div class={style.date}>{this.props.date}</div>
                             <div class={style.time}>{this.props.time}</div>
+                            {/* <div class={style.vLineSpace}>|</div> */}
+                            <div class={style.date}>{this.props.date}|</div>                            
                         </div>
+
+                        
                 </div>
             </div>
         );
