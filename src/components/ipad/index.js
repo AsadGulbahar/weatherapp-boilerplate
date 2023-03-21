@@ -219,10 +219,10 @@ export default class Ipad extends Component {
 		this.getURL();
 	};
 
-	click = (forecast) => {
+	click = () => {
 		console.log("clicked")
-		console.log("clicked on forecast: ", forecast)
-		this.setState({forecastUsed: forecast});
+		// console.log("clicked on forecast: ", forecast)
+		// this.setState({forecastUsed: forecast});
 		return true
 	}
 	
