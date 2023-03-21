@@ -14,8 +14,13 @@ export default class Section1 extends Component{
                                 <input type="text" placeholder="Change Location" onChange={this.props.handleChange} />
                             </div>
                             <div class={style.location}>{this.props.location}</div>
-                            <div class={style.temperature}>{this.props.temperature}</div>
-                            <div class={style.conditions}><img src={this.props.icon}></img></div>
+                            <div class={style.temperature}>
+                                {this.props.temperature}
+                                {/* <span class={style.conditions}> */}
+                                    <img src={this.props.icon}></img>
+                                {/* </span> */}
+                            </div>
+                            
                         </div>
                         <div class={style.datetime}>
                             <div class={style.time}>{this.props.time}</div>

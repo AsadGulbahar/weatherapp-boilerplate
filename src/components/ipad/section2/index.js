@@ -27,7 +27,7 @@ export default class Section2 extends Component{
                         <div class={style.data}>{this.props.pressure}</div>
                     </div>
                     <div class={style.box}>
-                        <span class={style.title}>Clouds</span>
+                        <span class={style.title}>Cloud Coverage</span>
                         <div class={style.data}>{this.props.clouds}</div>
                     </div>
                 </div>

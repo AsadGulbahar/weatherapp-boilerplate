@@ -70,6 +70,8 @@ export default class header extends Component{
 
 
     render(){
+        
+        
         return (
             <header class={style.header}>
                 <span class={style.warning}></span>

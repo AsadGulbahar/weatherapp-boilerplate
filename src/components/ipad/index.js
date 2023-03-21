@@ -12,8 +12,8 @@ import Header from './header';
 import Section1 from './section1';
 // import the section2 component
 import Section2 from './section2';
-// import the section3 component
-import Section3 from './section3';
+// import the Forecasts component
+import Forecasts from './forecasts';
 
 export default class Ipad extends Component {
 	//var Ipad = React.createClass({
@@ -60,8 +60,6 @@ export default class Ipad extends Component {
 		this.state.fiveDayForecasts = [];
 
 	}
-
-	windDirection = new Map();
 
 	// a call to set the latitude and longitude states
 	setCoords(position) {
@@ -126,7 +124,7 @@ export default class Ipad extends Component {
 			if (data.cod == "400" || data.cod == "404"){
 				window.alert("Please enter a valid airport code or city name. Enter 'current' to use your current location.")
 			} else {
-				let threeHourForecasts = [];
+				let tHF = [];
 				for (let i = 0; i < 5; i++){
 					let forecast = {
 						loc: this.state.location,
@@ -141,12 +139,12 @@ export default class Ipad extends Component {
 						clouds: data.list[i].clouds.all + "%",
 						icon: "https://openweathermap.org/img/wn/" +data.list[i].weather[0].icon+ "@2x.png"
 					}
-					threeHourForecasts.push(forecast)
+					tHF.push(forecast)
 				}
-				this.setState({threeHourForecasts: threeHourForecasts})
+				this.setState({threeHourForecasts: tHF})
 				console.log(this.state.threeHourForecasts)
 
-				let fiveDayForecasts = [];
+				let fDF = [];
 				for (let i = 7; i < 40; i += 8){
 					let forecast = {
 						loc: this.state.location,
@@ -161,9 +159,9 @@ export default class Ipad extends Component {
 						clouds: data.list[i].clouds.all + "%",
 						icon: "https://openweathermap.org/img/wn/" +data.list[i].weather[0].icon+ "@2x.png"
 					}
-					fiveDayForecasts.push(forecast)
+					fDF.push(forecast)
 				}
-				this.setState({fiveDayForecasts: fiveDayForecasts})
+				this.setState({fiveDayForecasts: fDF})
 				console.log(this.state.fiveDayForecasts)
 			}
 
@@ -248,45 +246,49 @@ export default class Ipad extends Component {
 
 	// the main render method for the ipad component
 	render() { 
-		// check if temperature data is fetched, if so add the sign styling to the page
-		const tempStyles = this.state.temp ? `${style.temperature} ${style.filled}` : style.temperature;
 
 
-		// display all weather data
-		return (
-			<div class={style.container}>
-				<Header 
-					temp = {this.state.temp}
-                    clouds = {this.state.clouds}
-                    pressure = {this.state.pressure}
-                    humidity = {this.state.humidity}
-                    wind = {this.state.windSp}
-				/>
-				<Section1 
-					handleChange = {this.handleLocationChange}
-					location = {this.state.loc} 
-					temperature = {this.state.temp}
-					icon = {this.state.icon}
-					date = {this.state.date}
-					time = {this.state.time}
-				/>
-				<Section2 
-					clouds = {this.state.clouds}
-					pressure = {this.state.pressure}
-					humidity = {this.state.humidity}
-					wind = {this.state.windSp}
-					windDir = {this.state.windDir}
-				/>
-				<Section3 
-					title = "18-hour Forecast"
-					forecasts = {this.state.threeHourForecasts}
-				/>
-				<Section3 
-					title = "5-day Forecast"
-					forecasts = {this.state.fiveDayForecasts}
-				/>
-			</div>
-		);
+		// check if all data is fetched, if so render the page
+		if (this.state.fiveDayForecasts.length == 5 && this.state.threeHourForecasts.length == 5){
+
+
+			
+			return (
+				<div class={style.container}>
+					<Header 
+						temp = {this.state.temp}
+						clouds = {this.state.clouds}
+						pressure = {this.state.pressure}
+						humidity = {this.state.humidity}
+						wind = {this.state.windSp}
+					/>
+					<Section1 
+						handleChange = {this.handleLocationChange}
+						location = {this.state.loc} 
+						temperature = {this.state.temp}
+						icon = {this.state.icon}
+						date = {this.state.date}
+						time = {this.state.time}
+					/>
+					<Section2 
+						clouds = {this.state.clouds}
+						pressure = {this.state.pressure}
+						humidity = {this.state.humidity}
+						wind = {this.state.windSp}
+						windDir = {this.state.windDir}
+					/>
+					<Forecasts 
+						title = "18-hour Forecast"
+						forecasts = {this.state.threeHourForecasts}
+						
+					/>
+					<Forecasts 
+						title = "5-day Forecast"
+						forecasts = {this.state.fiveDayForecasts}
+					/>
+				</div>
+			);
+		}
 	}
 
 }
