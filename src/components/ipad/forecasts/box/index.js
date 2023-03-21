@@ -9,6 +9,7 @@ export default class Box extends Component {
         super(props);
     }
     
+    // seperate function used due to errors with using arguments in the onClick function
     handleClickInBox = () => {
         this.props.handleClick(this.props.forecast)
     }

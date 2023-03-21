@@ -282,6 +282,13 @@ export default class Ipad extends Component {
 						clouds = {this.state.forecastUsed.clouds}
 						icon = {this.state.forecastUsed.icon}
 					/>
+					<Section2
+						clouds = {this.state.forecastUsed.clouds}
+						pressure = {this.state.forecastUsed.pressure}
+						humidity = {this.state.forecastUsed.humidity}
+						wind = {this.state.forecastUsed.windSp}
+						windDir = {this.state.forecastUsed.windDir}
+					/>
 
 				</div>
 				

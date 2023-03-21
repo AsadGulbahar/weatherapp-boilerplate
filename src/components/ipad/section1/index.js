@@ -28,6 +28,7 @@ export default class Section1 extends Component{
                         
                 </div>
             </div>
+            
         );
     }
 }
