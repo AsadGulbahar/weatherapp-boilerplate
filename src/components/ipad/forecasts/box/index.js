@@ -8,14 +8,15 @@ export default class Box extends Component {
     constructor(props) {
         super(props);
     }
- 
+    
+    handleClickInBox = () => {
+        this.props.handleClick(this.props.forecast)
+    }
 
     // a call to the render function: using JSX syntax
     render() {
-
-
         return (
-            <div id="box" class={style.box} onClick={this.props.handleClick(this.props.forecast)}>
+            <div id="box" class={style.box} onClick={this.handleClickInBox}>
                 <span>{this.props.forecast.date} {this.props.forecast.time}</span>
                 <div>
                     <div><img src={this.props.forecast.icon}></img>{this.props.forecast.temp}</div>

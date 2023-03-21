@@ -14,6 +14,8 @@ import Section1 from './section1';
 import Section2 from './section2';
 // import the Forecasts component
 import Forecasts from './forecasts';
+// import the ForecastDetails component
+import ForecastDetails from './forecastDetails';
 
 export default class Ipad extends Component {
 	//var Ipad = React.createClass({
@@ -219,11 +221,9 @@ export default class Ipad extends Component {
 		this.getURL();
 	};
 
-	click = () => {
-		console.log("clicked")
-		// console.log("clicked on forecast: ", forecast)
-		// this.setState({forecastUsed: forecast});
-		return true
+	// sets the forecast to be displayed. called upon the click of any box in the 3hr or 5day forecasts
+	setForecast = (forecast) => {
+		this.setState({forecastUsed: forecast});
 	}
 	
 	// parse airports.csv file into hash table
@@ -256,6 +256,37 @@ export default class Ipad extends Component {
 
 	// the main render method for the ipad component
 	render() { 
+
+		// check if forecastUsed isn't null, if so render the forecast page
+		if (this.state.forecastUsed != null){
+			return(
+				<div class={style.container}>
+					<Header
+						temp = {this.state.forecastUsed.temp}
+						clouds = {this.state.forecastUsed.clouds}
+						pressure = {this.state.forecastUsed.pressure}
+						humidity = {this.state.forecastUsed.humidity}
+						wind = {this.state.forecastUsed.windSp}
+					/>
+					<ForecastDetails						
+						location = {this.state.loc} 
+						forecast = {this.state.forecastUsed}
+						date = {this.state.forecastUsed.date}
+						time = {this.state.forecastUsed.time}
+						temp = {this.state.forecastUsed.temp}
+						cond = {this.state.forecastUsed.cond}
+						windSp = {this.state.forecastUsed.windSp}
+						windDir = {this.state.forecastUsed.windDir}
+						humidity = {this.state.forecastUsed.humidity}
+						pressure = {this.state.forecastUsed.pressure}
+						clouds = {this.state.forecastUsed.clouds}
+						icon = {this.state.forecastUsed.icon}
+					/>
+
+				</div>
+				
+			)
+		}
 
 
 		// check if all data is fetched, if so render the page
@@ -290,13 +321,13 @@ export default class Ipad extends Component {
 					<Forecasts 
 						title = "18-hour Forecast"
 						forecasts = {this.state.threeHourForecasts}
-						handleClick = {this.click}
+						handleClick = {this.setForecast}
 						
 					/>
 					<Forecasts 
 						title = "5-day Forecast"
 						forecasts = {this.state.fiveDayForecasts}
-						handleClick = {this.click}
+						handleClick = {this.setForecast}
 					/>
 				</div>
 			);
