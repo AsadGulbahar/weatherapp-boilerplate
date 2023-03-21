@@ -4,6 +4,7 @@ import style from './style';
 
 
 export default class header extends Component{
+
     danger = false
     safetyCheck(){
         message = ""
@@ -64,7 +65,7 @@ export default class header extends Component{
     }
 
         
-    }
+    
 
 
 
@@ -84,4 +85,5 @@ export default class header extends Component{
             </header>
         )
     }
+    
 }
