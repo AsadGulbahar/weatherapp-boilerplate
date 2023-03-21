@@ -21,6 +21,9 @@ export default class Ipad extends Component {
 	// a constructor with initial set states
 	constructor(props){
 		super(props);
+		// forecast used state, null for displaying current weather
+		this.state.forecastUsed = null;
+		// location used state, current for displaying current weather
 		this.state.locationUsed = "current";
 		// latitude state
 		this.state.latitute = "";
@@ -215,6 +218,13 @@ export default class Ipad extends Component {
 		}
 		this.getURL();
 	};
+
+	click = (forecast) => {
+		console.log("clicked")
+		console.log("clicked on forecast: ", forecast)
+		this.setState({forecastUsed: forecast});
+		return true
+	}
 	
 	// parse airports.csv file into hash table
 	parseAirports = () => {
@@ -250,7 +260,7 @@ export default class Ipad extends Component {
 
 		// check if all data is fetched, if so render the page
 		if (this.state.fiveDayForecasts.length == 5 && this.state.threeHourForecasts.length == 5){
-
+			console.log("render main page")
 
 			
 			return (
@@ -280,11 +290,13 @@ export default class Ipad extends Component {
 					<Forecasts 
 						title = "18-hour Forecast"
 						forecasts = {this.state.threeHourForecasts}
+						handleClick = {this.click}
 						
 					/>
 					<Forecasts 
 						title = "5-day Forecast"
 						forecasts = {this.state.fiveDayForecasts}
+						handleClick = {this.click}
 					/>
 				</div>
 			);

@@ -15,31 +15,26 @@ export default class Forecasts extends Component{
             <div class={style.section}>
                 <span class={style.title}>{this.props.title}</span>
                 <div class={style.container}>
-                    {/* <div class={style.box}> */}
                         <Box 
                             forecast = {this.props.forecasts[0]}
+                            handleClick = {this.props.handleClick}
                         />
-                    {/* </div> */}
-                    {/* <div class={style.box}> */}
                         <Box 
                             forecast = {this.props.forecasts[1]}
+                            handleClick = {this.props.handleClick}
                         />
-                    {/* </div>                     */}
-                    {/* <div class={style.box}> */}
                         <Box 
                             forecast = {this.props.forecasts[2]}
+                            handleClick = {this.props.handleClick}
                         />
-                    {/* </div>                     */}
-                    {/* <div class={style.box}> */}
                         <Box 
                             forecast = {this.props.forecasts[3]}
+                            handleClick = {this.props.handleClick}
                         />
-                    {/* </div>                     */}
-                    {/* <div class={style.box}> */}
                         <Box 
                             forecast = {this.props.forecasts[4]}
+                            handleClick = {this.props.handleClick}
                         />
-                    {/* </div> */}
                 </div>
             </div>
         );

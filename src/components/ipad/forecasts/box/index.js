@@ -12,27 +12,17 @@ export default class Box extends Component {
 
     // a call to the render function: using JSX syntax
     render() {
-		let cFunction = this.props.clickFunction;
-		if(typeof cFunction !== 'function'){
-			cFunction = () => {
-				console.log("click function not defined")
-			}
-		}
 
-        
 
         return (
-                <div id="box" class={style.box} onClick={cFunction}>
-                    <span>{this.props.forecast.date} {this.props.forecast.time}</span>
-                    <div>
-                        <div><img src={this.props.forecast.icon}></img>{this.props.forecast.temp}</div>
-                        <div>Wind: {this.props.forecast.windSp} {this.props.forecast.windDir}</div>
-                        <div>Pressure: {this.props.forecast.pressure}</div>
-                    </div>
+            <div id="box" class={style.box} onClick={this.props.handleClick(this.props.forecast)}>
+                <span>{this.props.forecast.date} {this.props.forecast.time}</span>
+                <div>
+                    <div><img src={this.props.forecast.icon}></img>{this.props.forecast.temp}</div>
+                    <div>Wind: {this.props.forecast.windSp} {this.props.forecast.windDir}</div>
+                    <div>Pressure: {this.props.forecast.pressure}</div>
                 </div>
-            
-            
-            
+            </div>
         );
     }
 }
