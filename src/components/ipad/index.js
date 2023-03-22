@@ -84,10 +84,9 @@ export default class Ipad extends Component {
 		console.log("latitude: ", this.state.latitude, "longitude: ", this.state.longitude)
 	}
 
-
-	readFromAPI(url, furl){
+	// call to read data from API
+	readFromAPI(url){
 		console.log(url)
-		console.log(furl)
 		fetch(url)	
 		.then((resp) => resp.json())
 		.then(data => {
@@ -114,12 +113,12 @@ export default class Ipad extends Component {
 					clouds: data.clouds.all + "%",
 					icon: "https://openweathermap.org/img/wn/" +data.weather[0].icon+ "@2x.png" 
 				});
-				this.readFromAPIforecast(furl);
 			}
 
 		})
 	}
 
+	// call to read forecast data from API
 	readFromAPIforecast (furl){
 		console.log(furl)
 		fetch(furl)	
@@ -184,7 +183,9 @@ export default class Ipad extends Component {
 						if (position != null){
 							url += `&lat=${position.coords.latitude}&lon=${position.coords.longitude}`
 							forecasturl += `&lat=${position.coords.latitude}&lon=${position.coords.longitude}`
-							this.readFromAPI(url, forecasturl);
+							this.readFromAPI(url);
+							this.readFromAPIforecast(forecasturl);
+
 						} else {console.log("position is null")}
 						
 					} ,(e) => {	
@@ -197,11 +198,14 @@ export default class Ipad extends Component {
 		} else if (this.state.airports.has(this.state.locationUsed)) {
 			url += `&lat=${this.state.latitude}&lon=${this.state.longitude}`
 			forecasturl += `&lat=${this.state.latitude}&lon=${this.state.longitude}`
-			this.readFromAPI(url, forecasturl);
+			this.readFromAPI(url);
+			this.readFromAPIforecast(forecasturl);
 		} else {
 			url += `&q=${this.state.locationUsed}`
 			forecasturl += `&q=${this.state.locationUsed}`
-			this.readFromAPI(url, forecasturl);
+			this.readFromAPI(url);
+			this.readFromAPIforecast(forecasturl);
+
 		}
 	}
 
@@ -226,6 +230,11 @@ export default class Ipad extends Component {
 		this.setState({forecastUsed: forecast});
 	}
 	
+	// sets the main page to be displayed. called upon the click of the back button
+	setMainPage = () => {
+		this.setState({forecastUsed: null});
+	}
+
 	// parse airports.csv file into hash table
 	parseAirports = () => {
 		console.log("parsing airports")
@@ -281,6 +290,7 @@ export default class Ipad extends Component {
 						pressure = {this.state.forecastUsed.pressure}
 						clouds = {this.state.forecastUsed.clouds}
 						icon = {this.state.forecastUsed.icon}
+						handleClick = {this.setMainPage}
 					/>
 					<Section2
 						clouds = {this.state.forecastUsed.clouds}
