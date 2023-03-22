@@ -23,7 +23,7 @@ export default class Section1 extends Component{
                         </div>
                         <div class={style.datetime}>
                             <div class={style.time}>{this.props.time}</div>
-                            <div class={style.date}>{this.props.date}|</div>                            
+                            <div class={style.date}>{this.props.date}</div>                            
                         </div> 
                 </div>
             </div>
