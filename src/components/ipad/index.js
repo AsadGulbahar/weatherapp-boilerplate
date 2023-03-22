@@ -105,7 +105,7 @@ export default class Ipad extends Component {
 					cond: data.weather[0].description,
 					temp: data.main.temp + " °C",
 					date: new Date().toLocaleDateString(),
-					time: new Date().toLocaleTimeString(),
+					time: new Date().toLocaleTimeString([], {timeStyle: 'short'}),
 					windSp: data.wind.speed + " m/s",
 					windDir: data.wind.deg + "°",
 					humidity: data.main.humidity + "%",
