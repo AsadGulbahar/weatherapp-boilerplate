@@ -14,8 +14,6 @@ import Section1 from './section1';
 import Section2 from './section2';
 // import the Forecasts component
 import Forecasts from './forecasts';
-// import the ForecastDetails component
-import ForecastDetails from './forecastDetails';
 
 export default class Ipad extends Component {
 	//var Ipad = React.createClass({
@@ -41,6 +39,8 @@ export default class Ipad extends Component {
 		this.state.date = "";
 		// time state
 		this.state.time = "";
+		// time zone state
+		this.state.timezone = "";
 		// weather icon state
 		this.state.icon = null;
 		// wind speed state
@@ -84,6 +84,18 @@ export default class Ipad extends Component {
 		console.log("latitude: ", this.state.latitude, "longitude: ", this.state.longitude)
 	}
 
+	// convert to time zone
+	convertTimeZone(apiTime, timezone) {
+		var parsedApiTime = new Date(apiTime * 1000).toLocaleTimeString([], {timeStyle: 'short'});
+		if (timezone != 0) {
+			var newTime = apiTime+timezone;
+			console.log("apiTime: ", apiTime)
+			console.log("timezone: ", timezone)
+			console.log(newTime * 1000)
+			parsedApiTime = new Date(newTime * 1000).toLocaleTimeString([], {timeStyle: 'short'})
+		}
+		return parsedApiTime;
+	}
 	// call to read data from API
 	readFromAPI(url){
 		console.log(url)
@@ -94,28 +106,21 @@ export default class Ipad extends Component {
 			if (data.cod == "400" || data.cod == "404"){
 				window.alert("Please enter a valid airport code or city name. Enter 'current' to use your current location.")
 			} else {
-				let apiTime = data.dt;
-				var parsedApiTime = new Date(apiTime * 1000).toLocaleTimeString([], {timeStyle: 'short'});
-				if (data.timezone != 0) {
-					var newTime = apiTime+data.timezone;
-					console.log(data.dt)
-					console.log(data.timezone)
-					console.log(newTime * 1000)
-					parsedApiTime = new Date(newTime * 1000).toLocaleTimeString([], {timeStyle: 'short'})
-				}
-				
+
 				let location = "";
 				if (this.state.airports.has(this.state.locationUsed)){
 					location = this.state.airportCode + " " + this.state.airportName + ", " + data.name + ", " + data.sys.country
 				} else {
 					location = data.name + ", " + data.sys.country
 				}
+				let parsedApiTime = this.convertTimeZone(data.dt, data.timezone);
 				this.setState({
 					loc: location,
 					cond: data.weather[0].description,
 					temp: data.main.temp + " °C",
 					date: new Date().toLocaleDateString(),
 					time: parsedApiTime,
+					timezone: data.timezone,
 					windSp: data.wind.speed + " m/s",
 					windDir: data.wind.deg + "°",
 					humidity: data.main.humidity + "%",
@@ -140,10 +145,11 @@ export default class Ipad extends Component {
 			} else {
 				let tHF = [];
 				for (let i = 0; i < 5; i++){
+					let parsedApiTime = this.convertTimeZone(data.list[i].dt, this.state.timezone);
 					let forecast = {
 						loc: this.state.location,
 						date: new Date(data.list[i].dt_txt).toLocaleDateString(),
-						time: new Date(data.list[i].dt_txt).toLocaleTimeString(),
+						time: parsedApiTime,
 						temp: data.list[i].main.temp + " °C",
 						cond: data.list[i].weather[0].description,
 						windSp: data.list[i].wind.speed + " m/s",
@@ -160,10 +166,12 @@ export default class Ipad extends Component {
 
 				let fDF = [];
 				for (let i = 7; i < 40; i += 8){
+					let parsedApiTime = this.convertTimeZone(data.list[i].dt, this.state.timezone);
 					let forecast = {
+						
 						loc: this.state.location,
 						date: new Date(data.list[i].dt_txt).toLocaleDateString(),
-						time: new Date(data.list[i].dt_txt).toLocaleTimeString(),
+						time: parsedApiTime,
 						temp: data.list[i].main.temp + " °C",
 						cond: data.list[i].weather[0].description,
 						windSp: data.list[i].wind.speed + " m/s",
@@ -234,11 +242,6 @@ export default class Ipad extends Component {
 	setForecast = (forecast) => {
 		this.setState({forecastUsed: forecast});
 	}
-	
-	// sets the main page to be displayed. called upon the click of the back button
-	setMainPage = () => {
-		this.setState({forecastUsed: null});
-	}
 
 	// parse airports.csv file into hash table
 	parseAirports = () => {
@@ -279,48 +282,55 @@ export default class Ipad extends Component {
 
 		// check if forecastUsed isn't null, if so render the forecast page
 		if (this.state.forecastUsed != null){
-			return(
+
+			console.log(this.state.forecastUsed.date, this.state.forecastUsed.time)
+
+			return (
 				<div class={style.container}>
-					<Header
+					<Header 
 						temp = {this.state.forecastUsed.temp}
 						clouds = {this.state.forecastUsed.clouds}
 						pressure = {this.state.forecastUsed.pressure}
 						humidity = {this.state.forecastUsed.humidity}
 						wind = {this.state.forecastUsed.windSp}
 					/>
-					<ForecastDetails						
+					<Section1 
+						handleChange = {this.handleLocationChange}
 						location = {this.state.loc} 
-						forecast = {this.state.forecastUsed}
+						temperature = {this.state.forecastUsed.temp}
+						icon = {this.state.forecastUsed.icon}
 						date = {this.state.forecastUsed.date}
 						time = {this.state.forecastUsed.time}
-						temp = {this.state.forecastUsed.temp}
-						cond = {this.state.forecastUsed.cond}
-						windSp = {this.state.forecastUsed.windSp}
-						windDir = {this.state.forecastUsed.windDir}
-						humidity = {this.state.forecastUsed.humidity}
-						pressure = {this.state.forecastUsed.pressure}
-						clouds = {this.state.forecastUsed.clouds}
-						icon = {this.state.forecastUsed.icon}
-						handleClick = {this.setMainPage}
 					/>
-					<Section2
+					<Section2 
 						clouds = {this.state.forecastUsed.clouds}
 						pressure = {this.state.forecastUsed.pressure}
 						humidity = {this.state.forecastUsed.humidity}
 						wind = {this.state.forecastUsed.windSp}
 						windDir = {this.state.forecastUsed.windDir}
 					/>
-
+					<Forecasts 
+						title = "18-hour Forecast"
+						forecasts = {this.state.threeHourForecasts}
+						handleClick = {this.setForecast}
+						
+					/>
+					<Forecasts 
+						title = "5-day Forecast"
+						forecasts = {this.state.fiveDayForecasts}
+						handleClick = {this.setForecast}
+					/>
 				</div>
-				
-			)
+			);
 		}
 
+		
 
 		// check if all data is fetched, if so render the page
 		if (this.state.fiveDayForecasts.length == 5 && this.state.threeHourForecasts.length == 5){
 			console.log("render main page")
 
+			console.log(this.state.date, this.state.time)
 			
 			return (
 				<div class={style.container}>
