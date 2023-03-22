@@ -96,6 +96,7 @@ export default class Ipad extends Component {
 		}
 		return parsedApiTime;
 	}
+
 	// call to read data from API
 	readFromAPI(url){
 		console.log(url)
@@ -235,12 +236,17 @@ export default class Ipad extends Component {
 			console.log(selectedValue)
 			this.setCoords();
 		}
+		this.setState({forecastUsed: null});
 		this.getURL();
 	};
 
 	// sets the forecast to be displayed. called upon the click of any box in the 3hr or 5day forecasts
 	setForecast = (forecast) => {
-		this.setState({forecastUsed: forecast});
+		if (this.state.forecastUsed == forecast){
+			this.setState({forecastUsed: null});
+		} else {
+			this.setState({forecastUsed: forecast});
+		}
 	}
 
 	// parse airports.csv file into hash table
