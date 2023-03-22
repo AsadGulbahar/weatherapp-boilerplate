@@ -94,6 +94,16 @@ export default class Ipad extends Component {
 			if (data.cod == "400" || data.cod == "404"){
 				window.alert("Please enter a valid airport code or city name. Enter 'current' to use your current location.")
 			} else {
+				let apiTime = data.dt;
+				var parsedApiTime = new Date(apiTime * 1000).toLocaleTimeString([], {timeStyle: 'short'});
+				if (data.timezone != 0) {
+					var newTime = apiTime+data.timezone;
+					console.log(data.dt)
+					console.log(data.timezone)
+					console.log(newTime * 1000)
+					parsedApiTime = new Date(newTime * 1000).toLocaleTimeString([], {timeStyle: 'short'})
+				}
+				
 				let location = "";
 				if (this.state.airports.has(this.state.locationUsed)){
 					location = this.state.airportCode + " " + this.state.airportName + ", " + data.name + ", " + data.sys.country
@@ -105,7 +115,7 @@ export default class Ipad extends Component {
 					cond: data.weather[0].description,
 					temp: data.main.temp + " °C",
 					date: new Date().toLocaleDateString(),
-					time: new Date().toLocaleTimeString([], {timeStyle: 'short'}),
+					time: parsedApiTime,
 					windSp: data.wind.speed + " m/s",
 					windDir: data.wind.deg + "°",
 					humidity: data.main.humidity + "%",
