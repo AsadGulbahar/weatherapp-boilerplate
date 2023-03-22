@@ -209,11 +209,6 @@ export default class Ipad extends Component {
 		}
 	}
 
-	componentDidMount() {
-		this.parseAirports();
-		this.getURL();
-	}
-
 	handleLocationChange = (event) => {
 		var selectedValue = event.target.value;
 		this.setState({locationUsed: selectedValue});
@@ -262,6 +257,12 @@ export default class Ipad extends Component {
 			console.log(this.state.airports);
 		}
 	}
+
+	componentDidMount() {
+		this.parseAirports();
+		this.getURL();
+	}
+
 
 	// the main render method for the ipad component
 	render() { 

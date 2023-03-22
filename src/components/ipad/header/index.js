@@ -3,89 +3,102 @@ import { h, render, Component } from 'preact';
 import style from './style';
 
 
-export default class header extends Component{
+export default class Header extends Component{
 
-    danger = false
+    constructor(props){
+        super(props)
+        // danger state
+        this.state.danger = false;
+        // danger message state
+        this.state.message = null;
+    }
+
+
     safetyCheck(){
-        message = ""
-        tempMessage = ""
-        cloudMessage = ""
-        pressureMessage = ""
-        humidityMessage = ""
-        windMessage = ""
+        console.log("in safetyCheck")
+        let dangerMessage = "";
+        let moreThanOneDanger = false; // for appending commas in danger message if needed
 
         // dangerous weather conditions that stop flight take off
-        maxTemp = 47
-        maxClouds = 95
-        minPressure = 950
-        maxHumidity = 95
-        maxWind = 34
+        let maxTemp = 47
+        let minPressure = 950
+        let maxHumidity = 95
+        let maxWind = 34
 
-        tempDanger = false
-        cloudsDanger = false
-        pressureDanger = false
-        humidityDanger = false
-        windDanger = false
-
-        danger = false
-
-        if(temp>maxTemp){
-            tempDanger = true
-            tempMessage = "high temperature of " + temp + " °C , "
+        if(this.props.temp > maxTemp){
+            if (moreThanOneDanger){
+                dangerMessage += ", "
+            }
+            dangerMessage += "high temperature: " + this.props.temp + " °C"
+            moreThanOneDanger = true
         }
-        if(clouds>maxClouds){
-            cloudsDanger = true
-            cloudMessage = "high cloud coverage of " + clouds + "% , "
+        if(this.props.pressure < minPressure){
+            if (moreThanOneDanger){
+                dangerMessage += ", "
+            }
+            dangerMessage += "low pressure: " + this.props.pressure + " hPa"
+            moreThanOneDanger = true
+
         }
-        if(pressure<minPressure){
-            pressureDanger = true
-            pressureMessage = "low pressure of " + pressure + " hPa , "
+        if(this.props.humidity > maxHumidity){
+            if (moreThanOneDanger){
+                dangerMessage += ", "
+            }
+            dangerMessage += "high humidity level: " + this.props.humidity + "%"
+            moreThanOneDanger = true
+
         }
-        if(humidity>maxHumidity){
-            humidityDanger = true
-            humidityMessage = "high humidity level of " + humidity + "%, "
-        }
-        if(wind>maxWind){
-            windDanger = true
-            windMessage = "high wind speeds of " + wind + " m/s"
+        if(this.props.wind > maxWind){
+            if (moreThanOneDanger){
+                dangerMessage += ", "
+            }
+            dangerMessage += "high wind speeds: " + this.props.wind + " m/s"
+            moreThanOneDanger = true
         }
 
-
-
-        if(tempDanger == false | cloudsDanger == false | pressureDanger == false | humidityDanger == false | windDanger == false){
-            danger = false
-            message = "No Hazards: Safe to Fly"
+        if(dangerMessage == ""){
+            this.setState({
+                danger: false,
+                message: "No Hazards: Safe to Fly"
+            })
+            
         }
         else{
-            danger = true
-            message = "NOT safe to fly due to " + tempMessage + cloudMessage + pressureMessage + humidityMessage + windMessage
+            this.setState({
+                danger: true,
+                message: "DANGER - NOT SAFE TO FLY: " + dangerMessage
+            })
         }
-
-        return message
+        console.log(this.state.message)
     }
 
         
-    
+    componentDidMount(){
+        this.safetyCheck();
+    }
 
 
 
     render(){
-        
-        
-        return (
-            <header class={style.header}>
-                <span class={style.warning}></span>
-                safetyCheck()
-                {/* call function to display message */}
-                if (danger = false) {
-                    //make background colour green
-                }
-                else{
-                    //make background colour red
-                }
-
+        if (this.state.danger){
+            return (
+                <header class={style.header}>
+                <span class={style.warning}> 
+                    {this.state.message}
+                </span>
             </header>
-        )
+            )
+        } else {
+            return (
+                <header class={style.header}>
+                    <span class={style.safe}> 
+                        {this.state.message}
+                    </span>
+                </header>
+            )
+        }
+        
+
     }
     
 }
