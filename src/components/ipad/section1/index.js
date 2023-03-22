@@ -9,23 +9,22 @@ export default class Section1 extends Component{
         return( 
             <div class={style.section}>
                 <div class={style.container}>
-                        <div class={style.box}>
+                        <div>
                             <div class="input-container">
                                 <input type="text" placeholder="Change Location" onChange={this.props.handleChange} />
                             </div>
                             <div class={style.location}>{this.props.location}</div>
                             <div class={style.temperature}>
-                                {this.props.temperature}
+                                <span class={style.text}>
+                                    {this.props.temperature}
                                     <img src={this.props.icon}></img>
+                                </span>
                             </div>
-                            
                         </div>
                         <div class={style.datetime}>
                             <div class={style.time}>{this.props.time}</div>
                             <div class={style.date}>{this.props.date}|</div>                            
-                        </div>
-
-                        
+                        </div> 
                 </div>
             </div>
             
