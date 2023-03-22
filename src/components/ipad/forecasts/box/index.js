@@ -18,11 +18,15 @@ export default class Box extends Component {
     render() {
         return (
             <div id="box" class={style.box} onClick={this.handleClickInBox}>
-                <span>{this.props.forecast.date} {this.props.forecast.time}</span>
+                <p> 
+                    {/* wrapping in p tag adds line break */}
+                    <span class={style.date}>{this.props.forecast.date} {this.props.forecast.time}</span>
+                </p>
                 <div>
-                    <div><img src={this.props.forecast.icon}></img>{this.props.forecast.temp}</div>
-                    <div>Wind: {this.props.forecast.windSp} {this.props.forecast.windDir}</div>
-                    <div>Pressure: {this.props.forecast.pressure}</div>
+                    <img src={this.props.forecast.icon}></img>
+                    <div class={style.temp}>{this. props.forecast.temp}</div>
+                    <div class={style.wind}>Wind: {this.props.forecast.windSp} {this.props.forecast.windDir}</div>
+                    <div class={style.pressure}>Pressure: {this.props.forecast.pressure}</div>
                 </div>
             </div>
         );
