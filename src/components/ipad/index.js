@@ -285,7 +285,6 @@ export default class Ipad extends Component {
 
 	// the main render method for the ipad component
 	render() { 
-
 		// check if forecastUsed isn't null, if so render the forecast page
 		if (this.state.forecastUsed != null){
 
