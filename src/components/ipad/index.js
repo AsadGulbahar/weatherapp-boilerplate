@@ -64,7 +64,7 @@ export default class Ipad extends Component {
 		// 5 day forecasts array
 		this.state.fiveDayForecasts = [];
 		// Next safe time to fly
-		this.state.safeToFlyForecasts = [];
+		this.state.allForecasts = [];
 
 	}
 
@@ -205,8 +205,8 @@ export default class Ipad extends Component {
 					}
 					stfF.push(forecast)
 				}
-				this.setState({safeToFlyForecasts: stfF})
-				console.log(this.state.safeToFlyForecasts)
+				this.setState({allForecasts: stfF})
+				console.log(this.state.allForecasts)
 			}
 		})
 	}
@@ -215,7 +215,6 @@ export default class Ipad extends Component {
 	getURL() {
 		let url = `https://api.openweathermap.org/data/2.5/weather?appid=b406cf8ad004accec63c04f51a061e82&units=metric`;
 		let forecasturl = `https://api.openweathermap.org/data/2.5/forecast?appid=b406cf8ad004accec63c04f51a061e82&units=metric`;
-		let hazardurl = `https://api.openweathermap.org/data/2.5/forecast?appid=b406cf8ad004accec63c04f51a061e82&units=metric`;
 		if (this.state.locationUsed == "current"){
 			if (window.navigator.geolocation) {
 				window.navigator.geolocation.getCurrentPosition(		
@@ -223,10 +222,8 @@ export default class Ipad extends Component {
 						if (position != null){
 							url += `&lat=${position.coords.latitude}&lon=${position.coords.longitude}`
 							forecasturl += `&lat=${position.coords.latitude}&lon=${position.coords.longitude}`
-							hazardurl += `&lat=${position.coords.latitude}&lon=${position.coords.longitude}`
 							this.readFromAPI(url);
 							this.readFromAPIforecast(forecasturl);
-							this.readFromAPIhazard(hazardurl);
 
 						} else {console.log("position is null")}
 						
@@ -240,17 +237,13 @@ export default class Ipad extends Component {
 		} else if (this.state.airports.has(this.state.locationUsed)) {
 			url += `&lat=${this.state.latitude}&lon=${this.state.longitude}`
 			forecasturl += `&lat=${this.state.latitude}&lon=${this.state.longitude}`
-			hazardurl += `&lat=${this.state.latitude}&lon=${this.state.longitude}`
 			this.readFromAPI(url);
 			this.readFromAPIforecast(forecasturl);
-			this.readFromAPIhazard(hazardurl);
 		} else {
 			url += `&q=${this.state.locationUsed}`
 			forecasturl += `&q=${this.state.locationUsed}`
-			hazardurl += `&q=${this.state.locationUsed}`
 			this.readFromAPI(url);
 			this.readFromAPIforecast(forecasturl);
-			this.readFromAPIhazard(hazardurl);
 		}
 	}	
 
@@ -324,7 +317,13 @@ export default class Ipad extends Component {
 						pressure = {this.state.forecastUsed.pressure}
 						humidity = {this.state.forecastUsed.humidity}
 						wind = {this.state.forecastUsed.windSp}
-						forecasts = {this.state.threeHourForecasts}
+						forecasts = {this.state.forecastUsed.allForecasts}
+						// temp = {this.state.temp}
+						// clouds = {this.state.clouds}
+						// pressure = {this.state.pressure}
+						// humidity = {this.state.humidity}
+						// wind = {this.state.windSp}
+						// forecasts = {this.state.allForecasts}
 					/>
 					<Section1 
 						handleChange = {this.handleLocationChange}
@@ -361,7 +360,7 @@ export default class Ipad extends Component {
 		
 
 		// check if all data is fetched, if so render the page
-		if (this.state.fiveDayForecasts.length == 5 && this.state.threeHourForecasts.length == 5 && this.state.safeToFlyForecasts != 0){
+		if (this.state.fiveDayForecasts.length == 5 && this.state.threeHourForecasts.length == 5 && this.state.allForecasts != 0){
 			console.log("render main page")
 
 			console.log(this.state.date, this.state.time)
@@ -374,7 +373,8 @@ export default class Ipad extends Component {
 						pressure = {this.state.pressure}
 						humidity = {this.state.humidity}
 						wind = {this.state.windSp}
-						forecasts = {this.state.safeToFlyForecasts}
+						forecasts = {this.state.allForecasts}
+						
 					/>
 					<Section1 
 						handleChange = {this.handleLocationChange}

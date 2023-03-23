@@ -22,7 +22,7 @@ export default class Header extends Component{
         let nextSafeTime = "";
 
         // dangerous weather conditions that stop flight take off
-        let maxTemp = 47
+        let maxTemp = 1
         let minPressure = 950
         let maxHumidity = 95
         let maxWind = 34
