@@ -6,6 +6,7 @@ import style from './style';
 export default class Section1 extends Component{
 
     render(){
+
         return( 
             <div class={style.section}>
                 <div class={style.container}>

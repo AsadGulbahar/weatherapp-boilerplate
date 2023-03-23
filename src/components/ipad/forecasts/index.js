@@ -10,7 +10,6 @@ export default class Forecasts extends Component{
 
 
     render(){
-
         return( 
             <div class={style.section}>
                 <span class={style.title}>{this.props.title}</span>

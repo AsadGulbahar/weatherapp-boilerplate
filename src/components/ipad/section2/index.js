@@ -7,7 +7,6 @@ export default class Section2 extends Component{
 
     render(){
         return( 
-            
             <div class={style.section}>
                 <div class={style.container}>
                     <div class={style.box}>

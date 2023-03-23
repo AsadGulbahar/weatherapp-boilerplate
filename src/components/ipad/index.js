@@ -21,50 +21,30 @@ export default class Ipad extends Component {
 	// a constructor with initial set states
 	constructor(props){
 		super(props);
-		// forecast used state, null for displaying current weather
 		this.state.forecastUsed = null;
-		// location used state, current for displaying current weather
 		this.state.locationUsed = "current";
-		// latitude state
 		this.state.latitute = "";
-		//	longitude state
 		this.state.longitude = "";
-		// current location state
 		this.state.location = "";
-		// temperature state
 		this.state.temp = "";
-		// weather conditions state
 		this.state.cond = "";
-		// date state
 		this.state.date = "";
-		// time state
 		this.state.time = "";
-		// time zone state
 		this.state.timezone = "";
-		// weather icon state
 		this.state.icon = null;
-		// wind speed state
 		this.state.windSp = "";
-		// wind direction state
 		this.state.windDir = "";
-		// humidity state
 		this.state.humidity = "";
-		// pressure state
 		this.state.pressure = "";
-		// clouds state
 		this.state.clouds = "";
-		// airport code state
 		this.state.airportCode = "";
-		// airport name state
 		this.state.airportName = "";
-		// airports hash map
 		this.state.airports = new Map();
-		// three hour forecasts array
 		this.state.threeHourForecasts = [];
-		// 5 day forecasts array
 		this.state.fiveDayForecasts = [];
-		// Next safe time to fly
 		this.state.allForecasts = [];
+		this.state.danger = false;
+		this.state.headerMessage = "";
 
 	}
 
@@ -191,7 +171,7 @@ export default class Ipad extends Component {
 				this.setState({fiveDayForecasts: fDF})
 				console.log(this.state.fiveDayForecasts)
 
-				let stfF = [];
+				let allF = [];
 				for (let i = 0; i < data.list.length; i++){
 					let parsedApiTime = this.convertTimeZone(data.list[i].dt, this.state.timezone);
 					let forecast = {
@@ -203,12 +183,14 @@ export default class Ipad extends Component {
 						humidity: data.list[i].main.humidity,
 						pressure: data.list[i].main.pressure,
 					}
-					stfF.push(forecast)
+					allF.push(forecast)
 				}
-				this.setState({allForecasts: stfF})
+				this.setState({allForecasts: allF})
 				console.log(this.state.allForecasts)
+				this.safetyCheck();
 			}
 		})
+		
 	}
 
 	// function to fetch location, temperature and weather conditions from openweathermap API
@@ -246,6 +228,103 @@ export default class Ipad extends Component {
 			this.readFromAPIforecast(forecasturl);
 		}
 	}	
+
+	safetyCheck() {
+        console.log("in safetyCheck")
+        let dangerMessage = "";
+        let moreThanOneDanger = false; // for appending commas in danger message if needed
+        let nextSafeTime = "";
+
+		let temp;
+		let pressure;
+		let humidity;
+		let wind;
+
+		console.log("forecastUsed: ", this.state.forecastUsed != null)
+
+		if (this.state.forecastUsed != null){
+			temp = this.state.forecastUsed.temp;
+			pressure = this.state.forecastUsed.pressure;
+			humidity = this.state.forecastUsed.humidity;
+			wind = this.state.forecastUsed.windSp;
+		} else {
+			temp = this.state.temp;
+			pressure = this.state.pressure;
+			humidity = this.state.humidity;
+			wind = this.state.windSp;
+		}
+
+		console.log("inside safetyCheck: " + temp + " " + pressure + " " + humidity + " " + wind)
+
+        // dangerous weather conditions that stop flight take off
+        let maxTemp = 1
+        let minPressure = 950
+        let maxHumidity = 95
+        let maxWind = 34
+        // let maxTemp = 1
+        // let minPressure = 10000
+        // let maxHumidity = 1
+        // let maxWind = 1
+
+        if(parseFloat(temp) > maxTemp){
+            if (moreThanOneDanger){
+                dangerMessage += ", "
+            }
+            dangerMessage += "high temperature: " + temp
+            moreThanOneDanger = true
+        }
+        if(parseFloat(pressure) > minPressure){
+            if (moreThanOneDanger){
+                dangerMessage += ", "
+            }
+            dangerMessage += "low pressure: " + pressure
+            moreThanOneDanger = true
+
+        }
+        if(parseFloat(humidity) > maxHumidity){
+            if (moreThanOneDanger){
+                dangerMessage += ", "
+            }
+            dangerMessage += "high humidity level: " + humidity
+            moreThanOneDanger = true
+
+        }
+        if(parseFloat(wind) > maxWind){
+            if (moreThanOneDanger){
+                dangerMessage += ", "
+            }
+            dangerMessage += "high wind speeds: " + wind
+            moreThanOneDanger = true
+        }
+
+        if(dangerMessage == ""){
+            this.setState({
+                danger: false,
+                headerMessage: "No Hazards: Safe to Fly"
+            })
+        } else {
+            for (let i = 0; i < this.state.allForecasts.length; i++) {
+                const forecast = this.state.allForecasts[i];
+                const forecastTemperature = forecast.temp;
+                const forecastAirPressure = forecast.pressure;
+                const forecastHumidity = forecast.humidity;
+                const forecastWindSpeed = forecast.windSp;
+                const forecastTime = forecast.time;
+
+                console.log("Forecast: " + forecastTemperature + forecastAirPressure + forecastHumidity + forecastWindSpeed + forecastTime)
+
+
+                if(forecastTemperature < 47 && forecastAirPressure > 950 && forecastHumidity < 95 && forecastWindSpeed < 34) {
+                    nextSafeTime = forecastTime
+                    break;
+                }
+            }
+            this.setState({
+                danger: true,
+                headerMessage: "NOT SAFE TO FLY: " + dangerMessage + " | Safe to Fly at Approx: " + nextSafeTime
+            })
+        } 
+    }
 
 	handleLocationChange = (event) => {
 		var selectedValue = event.target.value;
@@ -304,6 +383,7 @@ export default class Ipad extends Component {
 
 	// the main render method for the ipad component
 	render() { 
+
 		// check if forecastUsed isn't null, if so render the forecast page
 		if (this.state.forecastUsed != null){
 
@@ -317,7 +397,10 @@ export default class Ipad extends Component {
 						pressure = {this.state.forecastUsed.pressure}
 						humidity = {this.state.forecastUsed.humidity}
 						wind = {this.state.forecastUsed.windSp}
-						forecasts = {this.state.forecastUsed.allForecasts}
+						safetyCheck = {this.safetyCheck}
+						forecasts = {this.state.allForecasts}
+						message = {this.state.headerMessage}
+						danger = {this.state.danger}
 						// temp = {this.state.temp}
 						// clouds = {this.state.clouds}
 						// pressure = {this.state.pressure}
@@ -359,11 +442,9 @@ export default class Ipad extends Component {
 
 		
 
-		// check if all data is fetched, if so render the page
+		// check if all data is fetched, if so render the main page (display current weather data)
 		if (this.state.fiveDayForecasts.length == 5 && this.state.threeHourForecasts.length == 5 && this.state.allForecasts != 0){
 			console.log("render main page")
-
-			console.log(this.state.date, this.state.time)
 			
 			return (
 				<div class={style.container}>
@@ -373,7 +454,10 @@ export default class Ipad extends Component {
 						pressure = {this.state.pressure}
 						humidity = {this.state.humidity}
 						wind = {this.state.windSp}
+						safetyCheck = {this.safetyCheck}
 						forecasts = {this.state.allForecasts}
+						message = {this.state.headerMessage}
+						danger = {this.state.danger}
 						
 					/>
 					<Section1 
