@@ -16,8 +16,14 @@ export default class Box extends Component {
 
     // a call to the render function: using JSX syntax
     render() {
+        // if the forecast is selected, change the styling: adds gray border
+        if (this.props.selected === this.props.forecast) {
+            style.box = style.selected;
+        } else {
+            style.box = style.unselected;
+        }
         return (
-            <div id="box" class={style.box} onClick={this.handleClickInBox}>
+            <div class={style.box} onClick={this.handleClickInBox}>
                 <p> 
                     {/* wrapping in p tag adds line break */}
                     <span class={style.date}>{this.props.forecast.date} {this.props.forecast.time}</span>

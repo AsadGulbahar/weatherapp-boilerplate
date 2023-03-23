@@ -10,7 +10,7 @@ export default class Section1 extends Component{
             <div class={style.section}>
                 <div class={style.container}>
                         <div>
-                            <div class="input-container">
+                            <div class={style.input}>
                                 <input type="text" placeholder="Change Location" onChange={this.props.handleChange} />
                             </div>
                             <div class={style.location}>{this.props.location}</div>

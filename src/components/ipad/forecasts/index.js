@@ -17,22 +17,27 @@ export default class Forecasts extends Component{
                 <div class={style.container}>
                         <Box 
                             forecast = {this.props.forecasts[0]}
+                            selected = {this.props.selected}
                             handleClick = {this.props.handleClick}
                         />
                         <Box 
                             forecast = {this.props.forecasts[1]}
+                            selected = {this.props.selected}
                             handleClick = {this.props.handleClick}
                         />
                         <Box 
                             forecast = {this.props.forecasts[2]}
+                            selected = {this.props.selected}
                             handleClick = {this.props.handleClick}
                         />
                         <Box 
                             forecast = {this.props.forecasts[3]}
+                            selected = {this.props.selected}
                             handleClick = {this.props.handleClick}
                         />
                         <Box 
                             forecast = {this.props.forecasts[4]}
+                            selected = {this.props.selected}
                             handleClick = {this.props.handleClick}
                         />
                 </div>

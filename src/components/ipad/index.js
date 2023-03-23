@@ -318,12 +318,14 @@ export default class Ipad extends Component {
 					<Forecasts 
 						title = "18-hour Forecast"
 						forecasts = {this.state.threeHourForecasts}
+						selected = {this.state.forecastUsed}
 						handleClick = {this.setForecast}
 						
 					/>
 					<Forecasts 
 						title = "5-day Forecast"
 						forecasts = {this.state.fiveDayForecasts}
+						selected = {this.state.forecastUsed}
 						handleClick = {this.setForecast}
 					/>
 				</div>
@@ -365,12 +367,14 @@ export default class Ipad extends Component {
 					<Forecasts 
 						title = "18-hour Forecast"
 						forecasts = {this.state.threeHourForecasts}
+						selected = {this.state.forecastUsed}
 						handleClick = {this.setForecast}
 						
 					/>
 					<Forecasts 
 						title = "5-day Forecast"
 						forecasts = {this.state.fiveDayForecasts}
+						selected = {this.state.forecastUsed}
 						handleClick = {this.setForecast}
 					/>
 				</div>
