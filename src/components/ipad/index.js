@@ -21,49 +21,29 @@ export default class Ipad extends Component {
 	// a constructor with initial set states
 	constructor(props){
 		super(props);
-		// forecast used state, null for displaying current weather
-		this.state.forecastUsed = null;
-		// location used state, current for displaying current weather
-		this.state.locationUsed = "current";
-		// latitude state
-		this.state.latitute = "";
-		//	longitude state
-		this.state.longitude = "";
-		// current location state
-		this.state.location = "";
-		// temperature state
-		this.state.temp = "";
-		// weather conditions state
-		this.state.cond = "";
-		// date state
-		this.state.date = "";
-		// time state
-		this.state.time = "";
-		// time zone state
-		this.state.timezone = "";
-		// weather icon state
-		this.state.icon = null;
-		// wind speed state
-		this.state.windSp = "";
-		// wind direction state
-		this.state.windDir = "";
-		// humidity state
-		this.state.humidity = "";
-		// pressure state
-		this.state.pressure = "";
-		// clouds state
-		this.state.clouds = "";
-		// airport code state
-		this.state.airportCode = "";
-		// airport name state
-		this.state.airportName = "";
-		// airports hash map
-		this.state.airports = new Map();
-		// three hour forecasts array
-		this.state.threeHourForecasts = [];
-		// 5 day forecasts array
-		this.state.fiveDayForecasts = [];
-
+		this.setState({
+			forecastUsed: null, // null for displaying current weather
+			locationUsed: "current",
+			latitude: "",
+			longitude: "",
+			location: "",
+			temp: "",	
+			cond: "",
+			date: "",
+			time: "",
+			timezone: "",
+			icon: null,
+			windSp: "",
+			windDir: "",
+			humidity: "",
+			pressure: "",
+			clouds: "",
+			airportCode: "",
+			airportName: "",
+			airports: new Map(),
+			threeHourForecasts: [],
+			fiveDayForecasts: []
+		})
 	}
 
 	// a call to set the latitude and longitude states
@@ -142,7 +122,6 @@ export default class Ipad extends Component {
 		.then(data => {
 			console.log(data);
 			if (data.cod == "400" || data.cod == "404"){
-				window.alert("Please enter a valid airport code or city name. Enter 'current' to use your current location.")
 			} else {
 				let tHF = [];
 				for (let i = 0; i < 5; i++){
