@@ -63,6 +63,8 @@ export default class Ipad extends Component {
 		this.state.threeHourForecasts = [];
 		// 5 day forecasts array
 		this.state.fiveDayForecasts = [];
+		// Next safe time to fly
+		this.state.safeToFlyForecasts = [];
 
 	}
 
@@ -99,6 +101,7 @@ export default class Ipad extends Component {
 
 	// call to read data from API
 	readFromAPI(url){
+		console.log("In readFromAPI")
 		console.log(url)
 		fetch(url)	
 		.then((resp) => resp.json())
@@ -136,6 +139,7 @@ export default class Ipad extends Component {
 
 	// call to read forecast data from API
 	readFromAPIforecast (furl){
+		console.log("In readFromAPIforecast")
 		console.log(furl)
 		fetch(furl)	
 		.then((resp) => resp.json())
@@ -186,15 +190,32 @@ export default class Ipad extends Component {
 				}
 				this.setState({fiveDayForecasts: fDF})
 				console.log(this.state.fiveDayForecasts)
-			}
 
+				let stfF = [];
+				for (let i = 0; i < data.list.length; i++){
+					let parsedApiTime = this.convertTimeZone(data.list[i].dt, this.state.timezone);
+					let forecast = {
+						loc: this.state.location,
+						date: new Date(data.list[i].dt_txt).toLocaleDateString(),
+						time: parsedApiTime,
+						temp: data.list[i].main.temp,
+						windSp: data.list[i].wind.speed,
+						humidity: data.list[i].main.humidity,
+						pressure: data.list[i].main.pressure,
+					}
+					stfF.push(forecast)
+				}
+				this.setState({safeToFlyForecasts: stfF})
+				console.log(this.state.safeToFlyForecasts)
+			}
 		})
 	}
 
 	// function to fetch location, temperature and weather conditions from openweathermap API
-	getURL(){
+	getURL() {
 		let url = `https://api.openweathermap.org/data/2.5/weather?appid=b406cf8ad004accec63c04f51a061e82&units=metric`;
 		let forecasturl = `https://api.openweathermap.org/data/2.5/forecast?appid=b406cf8ad004accec63c04f51a061e82&units=metric`;
+		let hazardurl = `https://api.openweathermap.org/data/2.5/forecast?appid=b406cf8ad004accec63c04f51a061e82&units=metric`;
 		if (this.state.locationUsed == "current"){
 			if (window.navigator.geolocation) {
 				window.navigator.geolocation.getCurrentPosition(		
@@ -202,8 +223,10 @@ export default class Ipad extends Component {
 						if (position != null){
 							url += `&lat=${position.coords.latitude}&lon=${position.coords.longitude}`
 							forecasturl += `&lat=${position.coords.latitude}&lon=${position.coords.longitude}`
+							hazardurl += `&lat=${position.coords.latitude}&lon=${position.coords.longitude}`
 							this.readFromAPI(url);
 							this.readFromAPIforecast(forecasturl);
+							this.readFromAPIhazard(hazardurl);
 
 						} else {console.log("position is null")}
 						
@@ -217,16 +240,19 @@ export default class Ipad extends Component {
 		} else if (this.state.airports.has(this.state.locationUsed)) {
 			url += `&lat=${this.state.latitude}&lon=${this.state.longitude}`
 			forecasturl += `&lat=${this.state.latitude}&lon=${this.state.longitude}`
+			hazardurl += `&lat=${this.state.latitude}&lon=${this.state.longitude}`
 			this.readFromAPI(url);
 			this.readFromAPIforecast(forecasturl);
+			this.readFromAPIhazard(hazardurl);
 		} else {
 			url += `&q=${this.state.locationUsed}`
 			forecasturl += `&q=${this.state.locationUsed}`
+			hazardurl += `&q=${this.state.locationUsed}`
 			this.readFromAPI(url);
 			this.readFromAPIforecast(forecasturl);
-
+			this.readFromAPIhazard(hazardurl);
 		}
-	}
+	}	
 
 	handleLocationChange = (event) => {
 		var selectedValue = event.target.value;
@@ -298,6 +324,7 @@ export default class Ipad extends Component {
 						pressure = {this.state.forecastUsed.pressure}
 						humidity = {this.state.forecastUsed.humidity}
 						wind = {this.state.forecastUsed.windSp}
+						forecasts = {this.state.threeHourForecasts}
 					/>
 					<Section1 
 						handleChange = {this.handleLocationChange}
@@ -334,7 +361,7 @@ export default class Ipad extends Component {
 		
 
 		// check if all data is fetched, if so render the page
-		if (this.state.fiveDayForecasts.length == 5 && this.state.threeHourForecasts.length == 5){
+		if (this.state.fiveDayForecasts.length == 5 && this.state.threeHourForecasts.length == 5 && this.state.safeToFlyForecasts != 0){
 			console.log("render main page")
 
 			console.log(this.state.date, this.state.time)
@@ -347,6 +374,7 @@ export default class Ipad extends Component {
 						pressure = {this.state.pressure}
 						humidity = {this.state.humidity}
 						wind = {this.state.windSp}
+						forecasts = {this.state.safeToFlyForecasts}
 					/>
 					<Section1 
 						handleChange = {this.handleLocationChange}
