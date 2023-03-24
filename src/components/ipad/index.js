@@ -257,7 +257,7 @@ export default class Ipad extends Component {
 		console.log("inside safetyCheck: " + temp + " " + pressure + " " + humidity + " " + wind)
 
         // dangerous weather conditions that stop flight take off
-        let maxTemp = 1
+        let maxTemp = 47
         let minPressure = 950
         let maxHumidity = 95
         let maxWind = 34
@@ -268,32 +268,32 @@ export default class Ipad extends Component {
 
         if(parseFloat(temp) > maxTemp){
             if (moreThanOneDanger){
-                dangerMessage += ", "
+                dangerMessage += " | "
             }
-            dangerMessage += "high temperature: " + temp
+            dangerMessage += "High Temperature: " + temp
             moreThanOneDanger = true
         }
-        if(parseFloat(pressure) > minPressure){
+        if(parseFloat(pressure) < minPressure){
             if (moreThanOneDanger){
-                dangerMessage += ", "
+                dangerMessage += " | "
             }
-            dangerMessage += "low pressure: " + pressure
+            dangerMessage += "Low Pressure: " + pressure
             moreThanOneDanger = true
 
         }
         if(parseFloat(humidity) > maxHumidity){
             if (moreThanOneDanger){
-                dangerMessage += ", "
+                dangerMessage += " | "
             }
-            dangerMessage += "high humidity level: " + humidity
+            dangerMessage += "High Humidity Level: " + humidity
             moreThanOneDanger = true
 
         }
         if(parseFloat(wind) > maxWind){
             if (moreThanOneDanger){
-                dangerMessage += ", "
+                dangerMessage += " | "
             }
-            dangerMessage += "high wind speeds: " + wind
+            dangerMessage += "High Wind Speeds: " + wind
             moreThanOneDanger = true
         }
 
