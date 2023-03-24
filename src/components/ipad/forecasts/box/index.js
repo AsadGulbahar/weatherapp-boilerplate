@@ -30,9 +30,9 @@ export default class Box extends Component {
                 </p>
                 <div>
                     <img src={this.props.forecast.icon}></img>
-                    <div class={style.temp}>{this. props.forecast.temp}</div>
-                    <div class={style.wind}>Wind: {this.props.forecast.windSp} {this.props.forecast.windDir}</div>
-                    <div class={style.pressure}>Pressure: {this.props.forecast.pressure}</div>
+                    <div class={style.temp}>{this. props.forecast.temp} °C</div>
+                    <div class={style.wind}>Wind: {this.props.forecast.wind} knots {this.props.forecast.windDir}°</div>
+                    <div class={style.pressure}>Pressure: {this.props.forecast.pressure} hPa</div>
                 </div>
             </div>
         );

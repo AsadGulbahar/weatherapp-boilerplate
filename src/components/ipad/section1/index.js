@@ -17,7 +17,7 @@ export default class Section1 extends Component{
                             <div class={style.location}>{this.props.location}</div>
                             <div class={style.temperature}>
                                 <span class={style.text}>
-                                    {this.props.temperature}
+                                    {this.props.temperature} °C
                                     <img src={this.props.icon}></img>
                                 </span>
                             </div>
