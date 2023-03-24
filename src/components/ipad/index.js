@@ -257,14 +257,10 @@ export default class Ipad extends Component {
 		console.log("inside safetyCheck: " + temp + " " + pressure + " " + humidity + " " + wind)
 
         // dangerous weather conditions that stop flight take off
-        let maxTemp = 47
-        let minPressure = 950
-        let maxHumidity = 95
-        let maxWind = 34
         // let maxTemp = 1
-        // let minPressure = 10000
-        // let maxHumidity = 1
         // let maxWind = 1
+        let maxTemp = 47
+        let maxWind = 34
 
         if(parseFloat(temp) > maxTemp){
             if (moreThanOneDanger){
@@ -272,22 +268,6 @@ export default class Ipad extends Component {
             }
             dangerMessage += "High Temperature: " + temp
             moreThanOneDanger = true
-        }
-        if(parseFloat(pressure) < minPressure){
-            if (moreThanOneDanger){
-                dangerMessage += " | "
-            }
-            dangerMessage += "Low Pressure: " + pressure
-            moreThanOneDanger = true
-
-        }
-        if(parseFloat(humidity) > maxHumidity){
-            if (moreThanOneDanger){
-                dangerMessage += " | "
-            }
-            dangerMessage += "High Humidity Level: " + humidity
-            moreThanOneDanger = true
-
         }
         if(parseFloat(wind) > maxWind){
             if (moreThanOneDanger){
@@ -306,15 +286,13 @@ export default class Ipad extends Component {
             for (let i = 0; i < this.state.allForecasts.length; i++) {
                 const forecast = this.state.allForecasts[i];
                 const forecastTemperature = forecast.temp;
-                const forecastAirPressure = forecast.pressure;
-                const forecastHumidity = forecast.humidity;
                 const forecastWindSpeed = forecast.windSp;
                 const forecastTime = forecast.time;
 
-                console.log("Forecast: " + forecastTemperature + forecastAirPressure + forecastHumidity + forecastWindSpeed + forecastTime)
+                console.log("Forecast: " + forecastTemperature + forecastWindSpeed + forecastTime)
 
 
-                if(forecastTemperature < 47 && forecastAirPressure > 950 && forecastHumidity < 95 && forecastWindSpeed < 34) {
+                if(forecastTemperature < 47 && forecastWindSpeed < 34) {
                     nextSafeTime = forecastTime
                     break;
                 }
@@ -393,20 +371,14 @@ export default class Ipad extends Component {
 				<div class={style.container}>
 					<Header 
 						temp = {this.state.forecastUsed.temp}
-						clouds = {this.state.forecastUsed.clouds}
-						pressure = {this.state.forecastUsed.pressure}
-						humidity = {this.state.forecastUsed.humidity}
+						// clouds = {this.state.forecastUsed.clouds}
+						// pressure = {this.state.forecastUsed.pressure}
+						// humidity = {this.state.forecastUsed.humidity}
 						wind = {this.state.forecastUsed.windSp}
 						safetyCheck = {this.safetyCheck}
 						forecasts = {this.state.allForecasts}
 						message = {this.state.headerMessage}
 						danger = {this.state.danger}
-						// temp = {this.state.temp}
-						// clouds = {this.state.clouds}
-						// pressure = {this.state.pressure}
-						// humidity = {this.state.humidity}
-						// wind = {this.state.windSp}
-						// forecasts = {this.state.allForecasts}
 					/>
 					<Section1 
 						handleChange = {this.handleLocationChange}
@@ -450,9 +422,9 @@ export default class Ipad extends Component {
 				<div class={style.container}>
 					<Header 
 						temp = {this.state.temp}
-						clouds = {this.state.clouds}
-						pressure = {this.state.pressure}
-						humidity = {this.state.humidity}
+						// clouds = {this.state.clouds}
+						// pressure = {this.state.pressure}
+						// humidity = {this.state.humidity}
 						wind = {this.state.windSp}
 						safetyCheck = {this.safetyCheck}
 						forecasts = {this.state.allForecasts}
