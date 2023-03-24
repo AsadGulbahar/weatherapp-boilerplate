@@ -259,7 +259,7 @@ export default class Ipad extends Component {
 
         if(parseFloat(temp) > maxTemp){
             if (moreThanOneDanger){
-                dangerMessage += ", "
+                dangerMessage += " | "
             }
             dangerMessage += "high temperature: " + temp + "°C"
             moreThanOneDanger = true
@@ -273,7 +273,7 @@ export default class Ipad extends Component {
 		}
         if(parseFloat(wind) > maxWind){
             if (moreThanOneDanger){
-                dangerMessage += ", "
+                dangerMessage += " | "
             }
             dangerMessage += "high wind speeds: " + wind + " knots"
             moreThanOneDanger = true
