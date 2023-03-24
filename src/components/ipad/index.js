@@ -4,8 +4,6 @@ import { h, render, Component } from 'preact';
 import style from './style';
 // import jquery for API calls
 import $ from 'jquery';
-// import PapaParse for CSV parsing
-import Papa from 'papaparse';
 // import the header component
 import Header from './header';
 // import the section1 component
@@ -41,7 +39,7 @@ export default class Ipad extends Component {
 		this.state.airportCode = "";
 		this.state.airportName = "";
 		this.state.airports = new Map();
-		this.state.threeHourForecasts = [];
+		this.state.fifteenHourForecasts = [];
 		this.state.fiveDayForecasts = [];
 		this.state.allForecasts = [];
 		this.state.danger = false;
@@ -88,10 +86,9 @@ export default class Ipad extends Component {
 		.then((resp) => resp.json())
 		.then(data => {
 			console.log(data);
-			if (data.cod == "400" || data.cod == "404"){
+			if (data.cod == "400" || data.cod == "404"){ // if the API call returns an error
 				window.alert("Please enter a valid airport code or city name. Enter 'current' to use your current location.")
 			} else {
-
 				let location = "";
 				if (this.state.airports.has(this.state.locationUsed)){
 					location = this.state.airportCode + " " + this.state.airportName + ", " + data.name + ", " + data.sys.country
@@ -126,10 +123,9 @@ export default class Ipad extends Component {
 		.then((resp) => resp.json())
 		.then(data => {
 			console.log(data);
-			if (data.cod == "400" || data.cod == "404"){
-				window.alert("Please enter a valid airport code or city name. Enter 'current' to use your current location.")
+			if (data.cod == "400" || data.cod == "404"){ // if the API call returns an error
 			} else {
-				let tHF = [];
+				let fHF = [];
 				for (let i = 0; i < 5; i++){
 					let parsedApiTime = this.convertTimeZone(data.list[i].dt, this.state.timezone);
 					let forecast = {
@@ -145,10 +141,10 @@ export default class Ipad extends Component {
 						clouds: data.list[i].clouds.all,
 						icon: "https://openweathermap.org/img/wn/" +data.list[i].weather[0].icon+ "@2x.png"
 					}
-					tHF.push(forecast)
+					fHF.push(forecast)
 				}
-				this.setState({threeHourForecasts: tHF})
-				console.log(this.state.threeHourForecasts)
+				this.setState({fifteenHourForecasts: fHF})
+				console.log(this.state.fifteenHourForecasts)
 
 				let fDF = [];
 				for (let i = 7; i < 40; i += 8){
@@ -302,15 +298,19 @@ export default class Ipad extends Component {
 					this.state.allForecasts[i].temp > minTemp &&
 					this.state.allForecasts[i].wind < maxWind){
 					nextSafeTime = this.state.allForecasts[i].time + " on " + this.state.allForecasts[i].date
-					console.log("next safe time: ", nextSafeTime)
 					break;
 				}
 			}
 
             this.setState({
                 danger: true,
-                headerMessage: "NOT SAFE TO FLY - " + dangerMessage + " | Safe to Fly at: " + nextSafeTime
+                headerMessage: "NOT SAFE TO FLY - " + dangerMessage
             })
+			if (nextSafeTime != ""){
+				this.setState({
+					headerMessage: this.state.headerMessage + " | Safe to Fly at: " + nextSafeTime
+				})
+			}
         } 
     }
 
@@ -374,7 +374,7 @@ export default class Ipad extends Component {
 	render() { 
 
 		// check if all data is fetched
-		if (this.state.fiveDayForecasts.length == 5 && this.state.threeHourForecasts.length == 5 && this.state.allForecasts != 0){
+		if (this.state.fiveDayForecasts.length == 5 && this.state.fifteenHourForecasts.length == 5 && this.state.allForecasts != 0){
 			let temp, clouds, pressure, humidity, wind, windDir, icon, date, time;
 			// check if forecastUsed isn't null, if so render the forecast page
 			if (this.state.forecastUsed != null){
@@ -382,7 +382,7 @@ export default class Ipad extends Component {
 				clouds = this.state.forecastUsed.clouds;
 				pressure = this.state.forecastUsed.pressure;
 				humidity = this.state.forecastUsed.humidity;
-				wind = this.state.forecastUsed.windSp;
+				wind = this.state.forecastUsed.wind;
 				windDir = this.state.forecastUsed.windDir;
 				icon = this.state.forecastUsed.icon;
 				date = this.state.forecastUsed.date;
@@ -422,8 +422,8 @@ export default class Ipad extends Component {
 						windDir = {windDir}
 					/>
 					<Forecasts 
-						title = "18-hour Forecast"
-						forecasts = {this.state.threeHourForecasts}
+						title = "15-hour Forecast"
+						forecasts = {this.state.fifteenHourForecasts}
 						selected = {this.state.forecastUsed}
 						handleClick = {this.setForecast}
 					/>

@@ -25,8 +25,7 @@ export default class Box extends Component {
         return (
             <div class={style.box} onClick={this.handleClickInBox}>
                 <p> 
-                    {/* wrapping in p tag adds line break */}
-                    <span class={style.date}>{this.props.forecast.date} {this.props.forecast.time}</span>
+                    <span class={style.date}>{this.props.forecast.time} | {this.props.forecast.date}</span>
                 </p>
                 <div>
                     <img src={this.props.forecast.icon}></img>
