@@ -8,8 +8,7 @@ export default class Header extends Component{
         
 
     render(){
-        console.log(this.props.message)
-        if (this.props.danger){
+        if (this.props.danger){ // if danger is true, apply the danger style
             return (
                 <header class={style.header}>
                 <span class={style.warning}> 
@@ -17,7 +16,7 @@ export default class Header extends Component{
                 </span>
             </header>
             )
-        } else {
+        } else { // if danger is false, apply the safe style
             return (
                 <header class={style.header}>
                     <span class={style.safe}> 

@@ -48,7 +48,7 @@ export default class Ipad extends Component {
 	}
 
 	// a call to set the latitude and longitude states
-	setCoords(position) {
+	setCoords(position) { // only called for current location and for airport location, API url for city location is not set through coordinates
 		if (this.state.locationUsed == "current"){
 			this.setState({
 				latitude: position.coords.latitude,
@@ -62,17 +62,13 @@ export default class Ipad extends Component {
 				longitude: this.state.airports.get(this.state.airportCode)[2]
 			})
 		}
-		console.log("latitude: ", this.state.latitude, "longitude: ", this.state.longitude)
 	}
 
-	// convert to time zone
+	// convert time in accordance to time zone
 	convertTimeZone(apiTime, timezone) {
 		var parsedApiTime = new Date(apiTime * 1000).toLocaleTimeString([], {timeStyle: 'short'});
 		if (timezone != 0) {
 			var newTime = apiTime+timezone;
-			console.log("apiTime: ", apiTime)
-			console.log("timezone: ", timezone)
-			console.log(newTime * 1000)
 			parsedApiTime = new Date(newTime * 1000).toLocaleTimeString([], {timeStyle: 'short'})
 		}
 		return parsedApiTime;
@@ -80,12 +76,9 @@ export default class Ipad extends Component {
 
 	// call to read data from API
 	readFromAPI(url){
-		console.log("In readFromAPI")
-		console.log(url)
 		fetch(url)	
 		.then((resp) => resp.json())
 		.then(data => {
-			console.log(data);
 			if (data.cod == "400" || data.cod == "404"){ // if the API call returns an error
 				window.alert("Please enter a valid airport code or city name. Enter 'current' to use your current location.")
 			} else {
@@ -95,7 +88,7 @@ export default class Ipad extends Component {
 				} else {
 					location = data.name + ", " + data.sys.country
 				}
-				let parsedApiTime = this.convertTimeZone(data.dt, data.timezone);
+				let parsedApiTime = this.convertTimeZone(data.dt, data.timezone); // time conversion
 				this.setState({
 					loc: location,
 					cond: data.weather[0].description,
@@ -117,17 +110,16 @@ export default class Ipad extends Component {
 
 	// call to read forecast data from API
 	readFromAPIforecast (furl){
-		console.log("In readFromAPIforecast")
-		console.log(furl)
 		fetch(furl)	
 		.then((resp) => resp.json())
 		.then(data => {
-			console.log(data);
+			
+			// 15 hour forecast
 			if (data.cod == "400" || data.cod == "404"){ // if the API call returns an error
 			} else {
 				let fHF = [];
 				for (let i = 0; i < 5; i++){
-					let parsedApiTime = this.convertTimeZone(data.list[i].dt, this.state.timezone);
+					let parsedApiTime = this.convertTimeZone(data.list[i].dt, this.state.timezone); // time conversion
 					let forecast = {
 						loc: this.state.location,
 						date: new Date(data.list[i].dt_txt).toLocaleDateString(),
@@ -144,11 +136,11 @@ export default class Ipad extends Component {
 					fHF.push(forecast)
 				}
 				this.setState({fifteenHourForecasts: fHF})
-				console.log(this.state.fifteenHourForecasts)
-
+				
+				// 5 day forecast
 				let fDF = [];
 				for (let i = 7; i < 40; i += 8){
-					let parsedApiTime = this.convertTimeZone(data.list[i].dt, this.state.timezone);
+					let parsedApiTime = this.convertTimeZone(data.list[i].dt, this.state.timezone); // time conversion
 					let forecast = {
 						
 						loc: this.state.location,
@@ -166,10 +158,11 @@ export default class Ipad extends Component {
 					fDF.push(forecast)
 				}
 				this.setState({fiveDayForecasts: fDF})
-				console.log(this.state.fiveDayForecasts)
-				let allF = [];
+
+				// all forecasts
+				let allF = []; 
 				for (let i = 0; i < data.list.length; i++){
-					let parsedApiTime = this.convertTimeZone(data.list[i].dt, this.state.timezone);
+					let parsedApiTime = this.convertTimeZone(data.list[i].dt, this.state.timezone); // time conversion
 					let forecast = {
 						loc: this.state.location,
 						date: new Date(data.list[i].dt_txt).toLocaleDateString(),
@@ -185,8 +178,7 @@ export default class Ipad extends Component {
 					allF.push(forecast)
 				}
 				this.setState({allForecasts: allF})
-				console.log(this.state.allForecasts)
-				this.safetyCheck();
+				this.safetyCheck(); // call safety check function after all data is fetched
 			}
 		})
 		
@@ -196,7 +188,7 @@ export default class Ipad extends Component {
 	getURL() {
 		let url = `https://api.openweathermap.org/data/2.5/weather?appid=b406cf8ad004accec63c04f51a061e82&units=metric`;
 		let forecasturl = `https://api.openweathermap.org/data/2.5/forecast?appid=b406cf8ad004accec63c04f51a061e82&units=metric`;
-		if (this.state.locationUsed == "current"){
+		if (this.state.locationUsed == "current"){ // if the user wants to use their current location
 			if (window.navigator.geolocation) {
 				window.navigator.geolocation.getCurrentPosition(		
 					(position) => {
@@ -205,22 +197,20 @@ export default class Ipad extends Component {
 							forecasturl += `&lat=${position.coords.latitude}&lon=${position.coords.longitude}`
 							this.readFromAPI(url);
 							this.readFromAPIforecast(forecasturl);
-
-						} else {console.log("position is null")}
-						
+						}
 					} ,(e) => {	
-						console.log("geolocation error: ", e);
+						window.alert("geolocation error: ", e);
 					}
 				);
 			} else {
-				console.log("navigator not supported");
+				window.alert("navigator not supported");
 			}
-		} else if (this.state.airports.has(this.state.locationUsed)) {
+		} else if (this.state.airports.has(this.state.locationUsed)) { // if the user wants to use an ICAO airport code
 			url += `&lat=${this.state.latitude}&lon=${this.state.longitude}`
 			forecasturl += `&lat=${this.state.latitude}&lon=${this.state.longitude}`
 			this.readFromAPI(url);
 			this.readFromAPIforecast(forecasturl);
-		} else {
+		} else { // if the user wants to use a city name
 			url += `&q=${this.state.locationUsed}`
 			forecasturl += `&q=${this.state.locationUsed}`
 			this.readFromAPI(url);
@@ -228,15 +218,13 @@ export default class Ipad extends Component {
 		}
 	}	
 
+	// function to check if weather conditions are safe for flight, updates states for header. called in readFromAPI
 	safetyCheck() {
-        console.log("in safetyCheck")
         let dangerMessage = "";
         let moreThanOneDanger = false; // for appending commas in danger message if needed
         let nextSafeTime = "";
 		let temp;
 		let wind;
-
-		console.log("forecastUsed: ", this.state.forecastUsed != null)
 
 		if (this.state.forecastUsed != null){
 			temp = this.state.forecastUsed.temp;
@@ -246,13 +234,12 @@ export default class Ipad extends Component {
 			wind = this.state.windSp;
 		}
 
-		console.log("temp: ", temp, " wind: ", wind)
-
         // dangerous weather conditions that stop flight take off
         let maxTemp = 47
 		let minTemp = -30
         let maxWind = 45
 
+		// checking if weather conditions are safe for flight
         if(parseFloat(temp) > maxTemp){
             if (moreThanOneDanger){
                 dangerMessage += " | "
@@ -275,13 +262,12 @@ export default class Ipad extends Component {
             moreThanOneDanger = true
         }
 
-        if(dangerMessage == ""){
+        if(dangerMessage == ""){ // if no dangerous weather conditions
             this.setState({
                 danger: false,
                 headerMessage: "No Hazards: Safe to Fly"
             })
         } else {
-
 			let index = 0; // index at which to start finding next safe time (index where forecastUsed is located in allForecasts + 1)
 			if (this.state.forecastUsed != null){
 				for (let i = 0; i < this.state.allForecasts.length; i++){
@@ -314,32 +300,30 @@ export default class Ipad extends Component {
         } 
     }
 
-	// sets the location to be displayed
+	// sets the location to be displayed, called after the user enters a location in the search bar
 	handleLocationChange = (event) => {
 		var selectedValue = event.target.value;
 		this.setState({locationUsed: selectedValue});
 		if (this.state.airports.has(selectedValue.toUpperCase())){
 			this.setState({locationUsed: selectedValue.toUpperCase()});
-			console.log(selectedValue)
 			this.setCoords();
 		}
-		this.setState({forecastUsed: null});
+		this.setState({forecastUsed: null}); // reset forecastUsed to null, displays current weather
 		this.getURL();
 	}
 
 	// sets the forecast to be displayed. called upon the click of any box in the 3hr or 5day forecasts
 	setForecast = (forecast) => {
-		if (this.state.forecastUsed == forecast){
+		if (this.state.forecastUsed == forecast){ // if the user clicks on the same forecast again, set forecastUsed to null
 			this.setState({forecastUsed: null});
 		} else {
 			this.setState({forecastUsed: forecast});
 		}
-		this.safetyCheck();
+		this.safetyCheck(); 
 	}
 
 	// parse airports.csv file into hash table
 	parseAirports = () => {
-		console.log("parsing airports")
 		var airports = new Map();
 		$.ajax({
 			type: "GET",
@@ -361,7 +345,6 @@ export default class Ipad extends Component {
 			}
 			}
 			this.setState({airports: airports});
-			console.log(this.state.airports);
 		}
 	}
 

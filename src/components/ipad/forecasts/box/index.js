@@ -37,18 +37,3 @@ export default class Box extends Component {
         );
     }
 }
-
-// forecast object
-// let forecast = {
-//     loc: this.state.location,
-//     date: new Date(data.list[i].dt_txt).toLocaleDateString(),
-//     time: new Date(data.list[i].dt_txt).toLocaleTimeString(),
-//     temp: data.list[i].main.temp + " °C",
-//     cond: data.list[i].weather[0].description,
-//     windSp: data.list[i].wind.speed + " m/s",
-//     windDir: data.list[i].wind.deg + "°",
-//     humidity: data.list[i].main.humidity + "%",
-//     pressure: data.list[i].main.pressure + " hPa",
-//     clouds: data.list[i].clouds.all + "%",
-//     icon: "https://openweathermap.org/img/wn/" +data.list[i].weather[0].icon+ "@2x.png"
-// }
